@@ -2,6 +2,7 @@ import numpy as np
 import os
 import schroedinger as sc
 from tqdm import tqdm
+import matplotlib.pyplot as plt
  
 #------------------------output files------------------------------------|
 data_folder = 'Data'
@@ -48,11 +49,14 @@ for i in tqdm(range(ntau+1)):
     x3cor[i] = sc.correlation_function(EigVectors, EigValues, x, Step, 3, tau)
     cor3.write("{:.4f}\t{:.4f}\n".format(tau, x3cor[i]))
 
-#------------log derivative of <x(0)x(t)>--------------------------------------|
+#------------log derivative of <x^n(0)x^n(t)>--------------------------------------|
+add = np.full(ntau+1, -x2cor[ntau])
 dlog = sc.log_derivative(xcor, ntau, dtau)
+dlog2 = sc.log_derivative(np.add(x2cor,add), ntau, dtau)
+dlog3 = sc.log_derivative(x3cor, ntau, dtau)
 for i in range(ntau):
     tau = i * dtau
-    write_dlog.write("{:.4f}\t{:.4f}\n".format(tau, dlog[i]))
+    write_dlog.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(tau, dlog[i], dlog2[i], dlog3[i]))
     
 #------------partition function------------------------------------------------|
 xlmax = 100.0
@@ -80,7 +84,25 @@ write_groundstate.write('x '+'psi_0(x)\n')
 for j in range(point_num):
     write_groundstate.write("{:.4f}\t{:.4f}\n".format(x[j], ground_state[j]))
 
-
+plt.plot(x, ground_state, label = 'groundstate')
+plt.xlabel('x')
+plt.ylabel('Psi0(x)')
+plt.legend()
+plt.savefig('Data/qmdiag/groundstate.pdf')
+plt.savefig('Data/qmdiag/groundstate.png')
+plt.show()
+#------------plotting----------------------------------------------------------|
+plt.plot(x,V)
+for i in range(4):
+    plt.plot(x, EigVectors[:,i]**2 + EigValues[i], label = 'state '+str(i))
+plt.title('First 3 eigenvectors squared')
+plt.xlabel('x')
+plt.ylabel('Psi(x)')
+plt.ylim(0,10)
+plt.legend()
+plt.savefig('Data/qmdiag/eigenvectors.pdf')
+plt.savefig('Data/qmdiag/eigenvectors.png')
+plt.show()
 #-----------closing file-------------------------------------------------------|
 partition_function.close()
 write_eigenvalues.close()
