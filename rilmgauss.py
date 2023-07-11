@@ -157,8 +157,8 @@ x3cor2_sum = np.zeros(n_p)
 #------------------------------------------------------------------------------
 for i in tqdm(range(nmc)):
     nconf += 1
-    for i in range(N_inst):
-        z[i] = random.random()*tmax
+    for k in range(N_inst):
+        z[k] = random.random()*tmax
     z = np.sort(z)
     x = fn.new_config(x, n, N_inst, z, f, a)
     #   distribution of instantons                                             
@@ -172,14 +172,7 @@ for i in tqdm(range(nmc)):
     for j in range(1,n):
         tv = 2.0*x[j]**2*(x[j]**2-f**2)
         tvtot += a*tv
-        
-    #output configurations
-    if i % kp == 0:
-        config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S_tot, ttot, vtot))
-        for i in range(n):
-           config2.write("{:.4f}\t{:.4f}\n".format(i*a, x[i]))
-        config2.write("------------------\n\n")
-    #--------------------------------------------------------------------------
+    #------------------------------
     #   heat configuration: start from classical path  
     #--------------------------------------------------------------------------
     x_hot = np.copy(x)
@@ -188,12 +181,14 @@ for i in tqdm(range(nmc)):
     #--------------------------------------------------------------------------
     x_hot = fn.heating_update(x_hot, x, n, nheat, a, f, dx)
     if i % kp == 0:
+        config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S_tot, ttot, vtot))
+        config2.write('config: '+str(nconf)+'\n')
+        config_hot.write('config: '+str(nconf)+'\n')
         for j in range(n):
             config_hot.write("{:.4f}\t{:.4f}\n".format(j*a, x_hot[j]))
-        config_hot.write("------------------\n")
-        for j in range(n):
             config2.write("{:.4f}\t{:.4f}\n".format(j*a, x[j]))
         config2.write("------------------\n")
+        config_hot.write("------------------\n")
     #Histogram creation
     S_sum  += S_tot
     S2_sum += S_tot**2

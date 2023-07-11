@@ -34,7 +34,7 @@ if not os.path.exists(folder_path):
 energy = open('Data/qmswitch/energies.dat', 'w')
 energy.write('T\t E\n')        
 for index in range(6):
-    n = 800 - index *120
+    n = 800 - index *155
     switch = open('Data/qmswitch/switch.dat','w')
     switch.write('montecarlo switch\n ----- \n')
     switch.write('f\t n\t a\t nmc\t neq\t dx\t mode\t w0\t n_alpha\n')

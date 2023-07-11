@@ -14,7 +14,7 @@ def setting_inputs():
     n = 800 #lattice points
     a = 0.05 #lattice spacing
     neq = 100 #number of equilibration sweeps
-    nmc = 10**3 #number of MonteCarlo sweeps
+    nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
     n_p = 20 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
@@ -210,6 +210,7 @@ for i in tqdm(range(nmc)):
         x3cor2_sum = np.add(x3cor2_sum, xcor**6)
     if i % kp == 0:
          config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S, T, V))
+         config2.write('configuration: '+ str(ncor) + '\n' )
          for j in range(n):
              config2.write("{:.4f}\t{:.4f}\n".format(j*a, x[j]))
          config2.write("------------------\n")
@@ -250,6 +251,7 @@ for i in tqdm(range(nmc)):
             x3cool_sum = np.add(x3cool_sum, xcor_cool**3)
             x3cool2_sum = np.add(x3cool2_sum, xcor_cool**6)
        #----------------output cooled configurations------------------------------
+        config_cool.write('configuration: ' + str(ncor)+'\n')
         for j in range(n):
               config_cool.write("{:.4f}\t{:.4f}\n".format(j*a, xs[j]))
         config_cool.write("------------------\n")

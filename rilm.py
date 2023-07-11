@@ -41,7 +41,7 @@ def setting_inputs():
     a = 0.05 #lattice spacing
     N_inst = 10 #instanton
     neq = 100 #number of equilibration sweeps
-    nmc = 10**3 #number of MonteCarlo sweeps
+    nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
     n_p = 20 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration

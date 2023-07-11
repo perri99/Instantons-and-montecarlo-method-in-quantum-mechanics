@@ -58,7 +58,7 @@ def solve_schroedinger(mass: nb.float64, x: nb.float64[:], V: nb.float64[:], Ste
 @nb.jit(nopython = True)
 def correlation_function(E, e, x, dx, d, tau):
     G = 0
-    for n in range(5):
+    for n in range(40):
         c = 0
         for j in range(len(x)):
             c += x[j]**d * E[j,0] * E[j, n] *dx

@@ -538,8 +538,400 @@ plt.savefig('Data/qmidens/path.pdf')
 plt.savefig('Data/qmidens/path.png')
 plt.show()
 
+#   FIG. 10: Fig. a. Shows the rilm correlation functions
+#------------------------------------------------------------------------------
+''' Exact correlation functions vs montecarlo '''
+
+with open('Data/qmdiag/cor.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
 
 
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+with open('Data/qmdiag/cor2.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
 
 
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
 
+with open('Data/qmdiag/cor3.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+
+with open('Data/rilm/correlations_rilm.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '<x(0)x(τ)>')
+
+with open('Data/rilm/correlations2_rilm.dat', 'r') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = '<x^2(0)x^2(τ)>')
+
+with open('Data/rilm/correlations3_rilm.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
+plt.legend()
+plt.title('Correlation functions rilm')
+plt.xlim(0, 1)
+plt.xlabel('time')
+plt.ylabel('<x^n(0)x^n(τ)>')
+plt.savefig('Data/rilm/correlations.pdf')
+plt.savefig('Data/rilm/correlations.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. 10.b Shows the logarithmic derivative of the correlators
+#------------------------------------------------------------------------------
+''' Exact log derivatives vs Montecarlo simulation'''
+with open('Data/qmdiag/dlog.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+column4 = [float(line.split()[3]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column3)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column4)
+plt.plot(x, y, color = 'black')
+
+with open('Data/rilm/correlations_rilm.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'dlog<x(0)x(τ)>')
+
+with open('Data/rilm/correlations2_rilm.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+
+with open('Data/rilm/correlations3_rilm.dat', 'r') as file:
+    lines = file.readlines()[2:20]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+plt.legend()
+plt.ylim(0, 6)
+plt.xlim(0, 1)
+plt.title('Logarithmic derivatives of correlation functions')
+plt.xlabel('time')
+plt.ylabel('dlog<x^n(0)x^n(τ)>')
+plt.savefig('Data/rilm/dlog.pdf')
+plt.savefig('Data/rilm/dlog.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. 12: Typical euclidean path obtained in a Monte Carlo simulation of the 
+#   discretized euclidean action of the double well potential for  = 1.4.
+#------------------------------------------------------------------------------
+
+with open('Data/rilmgauss/config2_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()
+
+start_line = None
+end_line   = None
+for i, line in enumerate(lines):
+    if line.startswith('config: 701'):
+        start_line = i
+    elif line.startswith('config: 751'):
+        end_line = i
+        break
+data_lines = lines[start_line+1: end_line-1]
+
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+ 
+x     = np.array(column1)
+y     = np.array(column2)
+
+
+plt.plot(x, y, color = 'black',linewidth = 0.8, label = 'RILM')
+
+with open('Data/rilmgauss/config_hot_rilm.dat', 'r') as file:
+    lines = file.readlines()
+
+start_line = None
+end_line   = None
+for i, line in enumerate(lines):
+    if line.startswith('config: 701'):
+        start_line = i
+    elif line.startswith('config: 751'):
+        end_line = i
+        break
+data_lines = lines[start_line+1: end_line-1]
+
+column2 = [float(line.split()[1]) for line in data_lines]
+ 
+y     = np.array(column2)
+
+
+plt.plot(x, y, color = 'green',linewidth = 0.8, label = 'Gaussian fl')
+
+
+plt.xlabel('τ')
+plt.ylabel('x')
+plt.legend()
+plt.title('Random instanton configuration vs Gaussian fluctuations')
+
+plt.xlim(0, 20)
+plt.savefig('Data/rilmgauss/config.pdf')
+plt.savefig('Data/rilmgauss/config.jpeg')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. 13.a Shows the correlation functions in a random instanton ensamble
+#   with gaussian fluctuations
+#------------------------------------------------------------------------------
+''' Exact correlation functions vs montecarlo '''
+
+with open('Data/qmdiag/cor.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+with open('Data/qmdiag/cor2.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+with open('Data/qmdiag/cor3.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+
+with open('Data/rilmgauss/correlations_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '<x(0)x(τ)>')
+
+with open('Data/rilmgauss/correlations2_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = '<x^2(0)x^2(τ)>')
+
+with open('Data/rilmgauss/correlations3_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
+plt.legend()
+plt.title('Correlation functions rilm')
+plt.xlim(0, 1)
+plt.xlabel('time')
+plt.ylabel('<x^n(0)x^n(τ)>')
+plt.savefig('Data/rilmgauss/correlations.pdf')
+plt.savefig('Data/rilmgauss/correlations.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. 13.b Shows the logarithmic derivative of the correlators
+#------------------------------------------------------------------------------
+''' Exact log derivatives vs Montecarlo simulation'''
+with open('Data/qmdiag/dlog.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+column4 = [float(line.split()[3]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column3)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column4)
+plt.plot(x, y, color = 'black')
+
+with open('Data/rilmgauss/correlations_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'dlog<x(0)x(τ)>')
+
+with open('Data/rilmgauss/correlations2_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+
+with open('Data/rilmgauss/correlations3_rilmgauss.dat', 'r') as file:
+    lines = file.readlines()[2:20]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+plt.legend()
+plt.ylim(0, 6)
+plt.xlim(0, 1)
+plt.title('Logarithmic derivatives of correlation functions')
+plt.xlabel('time')
+plt.ylabel('dlog<x^n(0)x^n(τ)>')
+plt.savefig('Data/rilmgauss/dlog.pdf')
+plt.savefig('Data/rilmgauss/dlog.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   Fig.16 Distribution of instanton-anti-instanton separations
+#------------------------------------------------------------------------------
+with open('Data/rilm/hist_z_rilm.dat', 'r') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+x     = np.array(column1)
+y     = np.array(column2)
+
+plt.plot(x, y, color = 'red')
+
+with open('Data/iilm/zdist.dat', 'r') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+x     = np.array(column1)
+y     = np.array(column2)
+
+plt.plot(x, y, color = 'black', drawstyle = 'steps')
+
+plt.xlabel('τ_z')
+plt.ylabel('n_IA(τ_z)')
+plt.title('Istanton-anti-istanton separation distribution')
+
+plt.xlim(0,3.85)
+plt.ylim(0,40000)
+plt.show()

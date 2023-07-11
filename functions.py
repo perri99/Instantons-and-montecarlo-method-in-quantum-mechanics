@@ -9,7 +9,7 @@ def normalization(x,dx):
 
 @nb.jit(nopython = True)
 def new_config(x,n,N_inst, z, f, a):
-    for j in range(n):
+    for j in range(1,n):
         t = a*j
         x[j] = sum_ansatz_path(N_inst, z, f, t)
     x[0] = x[n-1]

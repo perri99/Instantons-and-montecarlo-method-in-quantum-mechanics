@@ -19,5 +19,13 @@ for j in tqdm(range(10)):
     for i in range(6):
         eigenvals[i,j] = e[i]
 for i in range (6):
-    plt.plot(f, eigenvals[i,:])
+    plt.plot(f, eigenvals[i,:], label = 'Eigenvalue '+str(i))
+
+plt.title('First six eigenvalues')
+plt.legend()    
+plt.xlabel('f: well separation')
+plt.ylabel('Energy')
+plt.savefig('Data/qmdiag/spectrum.pdf')
+plt.savefig('Data/qmdiag/spectrum.png')
 plt.show()
+
