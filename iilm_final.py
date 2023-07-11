@@ -2,6 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import random
 import functions as fn
+import os
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -35,6 +36,14 @@ xnin2 = dens2*tmax        #NLO total tunneling events
 nexp  = int(xnin+0.5)
 nexp2 = int(xnin2+0.5)
 '''-------------outputs file---------------------------------------------------'''
+data_folder = 'Data'
+subfolder = 'iilm' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        
 iilm = open('Data/iilm/iilm.dat', 'w')
 iilm.write('qm iilm\n n\t a\t f\n'+'{}\t{:.4f}\t{:.4f}\n'.format(n, a, f))
 iilm.write('N_inst\t nmc\t neq\t n_p\t nc\n'+'{}\t{}\t{}\t{}\t{}\n'.format(N_inst, nmc, neq, n_p, nc))

@@ -1,16 +1,23 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import math
+import os
 import schroedinger as sc
 from tqdm import tqdm
-    
-write_groundstate = open('Data/ground_state1_doublewell.dat', 'w')
-write_eigenvalues = open('Data/eigenvalues_doublewell.dat', 'w')
-cor = open('Data/cor.dat', 'w')
-cor2 = open('Data/cor2.dat', 'w')
-cor3 = open('Data/cor3.dat', 'w')
-write_dlog = open('Data/dlog.dat', 'w')
-partition_function = open('Data/partition_function.dat', 'w')
+ 
+#------------------------output files------------------------------------|
+data_folder = 'Data'
+subfolder = 'qmdiag' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+write_groundstate = open('Data/qmdiag/ground_state1_doublewell.dat', 'w')
+write_eigenvalues = open('Data/qmdiag/eigenvalues_doublewell.dat', 'w')
+cor = open('Data/qmdiag/cor.dat', 'w')
+cor2 = open('Data/qmdiag/cor2.dat', 'w')
+cor3 = open('Data/qmdiag/cor3.dat', 'w')
+write_dlog = open('Data/qmdiag/dlog.dat', 'w')
+partition_function = open('Data/qmdiag/partition_function.dat', 'w')
 
 tmax = 2.5
 ntau = 100

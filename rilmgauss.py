@@ -2,6 +2,7 @@ import numpy as np
 import random
 from tqdm import tqdm
 import functions as fn
+import os
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #     Random instanton calculation in quantum mechanics                     
@@ -64,6 +65,14 @@ xnin2 = dens2*tmax
 nexp  = int(xnin+0.5)
 nexp2 = int(xnin2+0.5)
 #--------opening output files----------------------------------------------------|
+data_folder = 'Data'
+subfolder = 'rilmgauss' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
 rilmgauss = open('Data/rilmgauss/rilmgauss.dat','w')
 rilmgauss.write('gaussian\n f, n, a, N_inst, nmc, n_p, nc, dx, nheat\n')
 rilmgauss.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(f, n, a, N_inst,nmc, n_p,nc, dx, nheat))

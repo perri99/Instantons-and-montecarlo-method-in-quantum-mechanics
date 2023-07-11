@@ -2,6 +2,7 @@ import numpy as np
 import random
 from tqdm import tqdm
 import functions as fn
+import os
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #     Random instanton calculation in quantum mechanics                     
@@ -107,6 +108,14 @@ x2cor2_sum = np.zeros(n_p)
 x3cor_sum  = np.zeros(n_p)
 x3cor2_sum = np.zeros(n_p)
 '''-------opening output files---------------------'''
+data_folder = 'Data'
+subfolder = 'rilm' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
 config1 = open('Data/rilm/trajectory_rilm.dat', 'w')
 config1.write('configuration, S_tot, T_tot, V_tot\n')
 

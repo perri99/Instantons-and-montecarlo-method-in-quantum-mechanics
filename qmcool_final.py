@@ -2,6 +2,7 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
+import os
 
 def setting_inputs():
     npri = 100
@@ -31,6 +32,14 @@ de  = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0)
 de2 = de*(1.0-71.0/72.0/s0)
 tmax = n*a
 #------------output files-------------------------------------------------------|
+data_folder = 'Data'
+subfolder = 'qmcool' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        
 averages = open('Data/qmcool/cool_averages.dat', 'w')
 averages.write('\tStot_av, S_tot_err, V_av, Verr,T_av, T_err, TV_av, TV_err\n')
 

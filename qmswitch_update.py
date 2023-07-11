@@ -2,6 +2,7 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
+import os
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -23,6 +24,14 @@ f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
 random.seed(seed)
 
 #output files
+data_folder = 'Data'
+subfolder = 'qmswitch' 
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+folder_path = os.path.join(data_folder, subfolder)
+if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        
 switch = open('Data/qmswitch/switch.dat','w')
 switch.write('montecarlo switch\n ----- \n')
 switch.write('f\t n\t a\t nmc\t neq\t dx\t mode\t w0\t n_alpha\n')
