@@ -72,7 +72,6 @@ x2_sum = 0
 x4_sum = 0
 x8_sum = 0
 #-----Array defnitions-----------------------------------------------|
-x = np.zeros(n)
 xcor_sum   = np.zeros(n_p)         
 xcor2_sum  = np.zeros(n_p) 
 x2cor_sum  = np.zeros(n_p)
@@ -89,7 +88,7 @@ histo_x    = np.zeros(nxhist)
 #dx = np.zeros(n_p-1)
 #dxe = np.zeros(n_p-1)
 #starting configuration-----------------------------------------|
-x = fn.periodic_starting_conf(x, n, f, mode)
+x = fn.periodic_starting_conf( n, f, mode)
 #---------montecarlo generations--------------------------------|
 for i in tqdm(range(nmc)):
     x = fn.update_periodic(x,n,a,f, dx)  #metropolis algorithm implementation with periodic boundary conditions
@@ -163,7 +162,7 @@ for ip in range(n_p-1):
     correlations3.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ip*a, x3cor_av[ip], x3cor_er[ip], dx3[ip], dxe3[ip]))
 #----------wave function---------------------------------------------------------------|
 position, wave_function = fn.building_wavefunction(histo_x, nxhist, stxhist, xhist_min)
-wave_function = fn.normalization(wave_function, position[1]-position[0])
+#wave_function = fn.normalization(wave_function, position[1]-position[0])
 for i in range(nxhist):
     wavefunction.write("{:.4f}\t{:.4f}\n".format(position[i], wave_function[i]))
 #-----------closing files--------------------------------------------------------------|
