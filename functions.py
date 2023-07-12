@@ -1,12 +1,21 @@
 import numpy as np
 import random
 import numba as nb
-
+#------------------------------------------------------------------------------|
+'''Functions needed in qm.py, qmswitch.py, qmcool.py, qmidens.py
+    rilm.py, rilmgauss.py, iilm.py'''
+#------------------------------------------------------------------------------|
+#-------------------------------------------------------------------------------------|
+#      normalization(x,dx): it returns an array normalized to 1, dx is lattice spacing
+'''Inputs:        x: array-like
+                 dx: floating type
+   Output:   x/norm: array-like'''
 @nb.jit(nopython = True)
 def normalization(x,dx):
     norm = np.sqrt(np.sum(x**2 * dx))
     return x/norm
-
+#-------------------------------------------------------------------------------------|
+#------------------------------------------------------------------------------|
 @nb.jit(nopython = True)
 def new_config(x,n,N_inst, z, f, a):
     for j in range(1,n):
@@ -101,13 +110,13 @@ def potential_diff(x, n, a, f, w0):
     return V_diff
 
 @nb.jit(nopython = True)
-def sshort(z, nin, tcore, score, tmax):
+def hardcore_interaction(z, nin, tcore, score, tmax, s0):
     shc = 0.0
     if tcore == 0:
         return shc
-    for i in range(nin+1):
+    for i in range(nin):
         if i == 0:
-            zm = z[nin] - tmax
+            zm = z[-1] - tmax
         else:
             zm = z[i-1]
         dz = z[i] - zm
@@ -302,10 +311,10 @@ def update_instanton(x, x0, w, vi, n, a, f, alpha, dx):
     return x
 
 @nb.jit(nopython = True)
-def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f):
+def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
     for iin in range(nin):
         sold   = action(x,n,a,f)
-        sold  += sshort(z, nin, tcore, score, tmax)
+        sold  += hardcore_interaction(z, nin, tcore, score, tmax, s0)
         zstore = np.copy(z)
         zold   = z[iin]
         znew   = zold + (random.random()-0.5)*dz
@@ -321,7 +330,7 @@ def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f):
         #----------------------------------------------------------------------
         x = new_config(x, n, nin, z, f, a)
         snew = action(x, n, a, f)
-        shc = sshort(z, nin, tcore, score, tmax)
+        shc = hardcore_interaction(z, nin, tcore, score, tmax, s0)
         snew += shc
         
         #----------------------------------------------------------------------

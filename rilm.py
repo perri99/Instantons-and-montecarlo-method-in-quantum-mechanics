@@ -92,7 +92,7 @@ x8_sum    = 0.0
 '''---------Array definitions-----------'''
 iz         = np.zeros(nzhist)
 x          =  np.zeros(n+1)
-z          =  np.zeros(N_inst+1)     
+z          =  np.zeros(N_inst)     
 xcor_av    = np.zeros(n_p)
 xcor_er    = np.zeros(n_p)
 x2cor_av   = np.zeros(n_p)

@@ -21,14 +21,14 @@ def setting_inputs():
     seed = 123456
     return f, n, a, neq, nmc, dx, n_p, nc, kp, N_tot, tcore, acore, dz, seed
 
-f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, rcore, acore, dz, seed = setting_inputs()
+f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, tcore, score, dz, seed = setting_inputs()
 random.seed(seed)
 '''----------Definitions-------------------------------------------------------'''
 pi    = np.pi
-tcore = rcore/f
+tcore = tcore/f
 tmax  = n*a
 s0    = 4.0/3.0*f**3
-score = acore*s0
+score = score*s0
 dens  = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0) #classical tunneling rate
 dens2 = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0-71.0/72.0/s0) #NLO tunneling rate
 xnin  = dens*tmax         # LO total tunneling events
@@ -77,7 +77,7 @@ x2_sum    = 0.0
 x4_sum    = 0.0
 x8_sum    = 0.0
 '''-------Array Defintions-----------------------------------------------------'''
-z          = np.zeros(N_inst+1)
+z          = np.zeros(N_inst)
 x          = np.zeros(n+1)
 iz         = np.zeros(nzhist)
 xcor_av    = np.zeros(n_p)
@@ -94,18 +94,18 @@ x2cor_sum  = np.zeros(n_p)
 x2cor2_sum = np.zeros(n_p)
 x3cor_sum  = np.zeros(n_p)
 x3cor2_sum = np.zeros(n_p)     
-'''#   plot S_IA                                                              
-#------------------------------------------------------------------------------'''
+#   plot S_IA                                                              
+#------------------------------------------------------------------------------
 ni = n//4
 sia.write('(na-ni)*a\t S/s0 - 2\n')
-for na in range(ni, ni*2+1):
+for na in range(ni, ni*2):
     z[0] = ni*a
     z[1] = na*a
     x = fn.new_config(x, n, 2, z, f, a)
     T = fn.kinetic(x, n, a)
     V = fn.potential(x, n, a, f)
     S = T+V
-    shc   = fn.sshort(z, 2, tcore, score, tmax)
+    shc   = fn.hardcore_interaction(z, 2, tcore, score, tmax, s0)
     S += shc
     sia.write('{:.4f}\t{:.4f}\n'.format((na-ni)*a, S/s0-2.0))
 #   setup and intial action                                                
@@ -141,7 +141,7 @@ for i in tqdm(range(nmc)):
         x3cor_sum  = np.zeros(n_p)
         x3cor2_sum = np.zeros(n_p)
         iz         = np.zeros(nzhist)
-    z, x = fn.update_interacting_instanton(N_inst, z, tmax, tcore, score, dz, x, n, a, f)
+    z, x = fn.update_interacting_instanton(N_inst, z, tmax, tcore, score, dz, x, n, a, f, s0)
     if i < 400:
         for ipr in range(min(10,len(z))):
             iconf.write(f'{z[ipr]:.4f}\t')
@@ -152,7 +152,7 @@ for i in tqdm(range(nmc)):
     T = fn.kinetic(x, n, a)
     V = fn.potential(x, n, a, f)
     S = T + V
-    sch = fn.sshort(z, N_inst, tcore, score, tmax)
+    sch = fn.hardcore_interaction(z, N_inst, tcore, score, tmax, s0)
     S += sch
     
     S_sum  += S

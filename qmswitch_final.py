@@ -6,7 +6,7 @@ import os
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
-    #n = 800 #lattice points
+    n = 800 #lattice points
     a = 0.05 #lattice spacing
     neq = 100 #number of equilibration sweeps
     nmc = 10**4 #number of MonteCarlo sweeps
@@ -17,10 +17,10 @@ def setting_inputs():
     mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
     seed = 597
     w0 = 5.6
-    return f,  a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
+    return n, f,  a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
 
 #setting inputs
-f, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
+n, f, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
 random.seed(seed)
 
 #output files
@@ -34,7 +34,7 @@ if not os.path.exists(folder_path):
 energy = open('Data/qmswitch/energies.dat', 'w')
 energy.write('T\t E\n')        
 for index in range(6):
-    n = 800 - index *155
+    a /=  2
     switch = open('Data/qmswitch/switch.dat','w')
     switch.write('montecarlo switch\n ----- \n')
     switch.write('f\t n\t a\t nmc\t neq\t dx\t mode\t w0\t n_alpha\n')
