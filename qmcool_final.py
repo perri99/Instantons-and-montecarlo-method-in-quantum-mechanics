@@ -36,14 +36,14 @@ fn.directory('qmcool')
 averages = open('Data/qmcool/cool_averages.dat', 'w')
 averages.write('\tStot_av, S_tot_err, V_av, Verr,T_av, T_err, TV_av, TV_err\n')
 
-instdensity = open('Data/qmcool/instdensity.dat', 'w')
-instdensity.write('number of instantons\n ic, nin_av[ic], nin_er[ic], de*tmax, de2*tmax\n')
+'''instdensity = open('Data/qmcool/instdensity.dat', 'w')
+instdensity.write('number of instantons\n ic, nin_av[ic], nin_er[ic], de*tmax, de2*tmax\n')'''
 
 coolingsweeps = open('Data/qmcool/coolingsweeps.dat', 'w')
 coolingsweeps.write(' action vs cooling sweeps\n ic, scool_av[ic], scool_er[ic], sin\n')
 
-inst_action = open('Data/qmcool/inst_action.dat', 'w')
-inst_action.write('Action per instanton, S0 = ' + str(4.0/3.0*f**3) +'\n ic, si_av, si_er, s0\n' )
+'''inst_action = open('Data/qmcool/inst_action.dat', 'w')
+inst_action.write('Action per instanton, S0 = ' + str(4.0/3.0*f**3) +'\n ic, si_av, si_er, s0\n' )'''
 
 histz = open('Data/qmcool/hist_z.dat', 'w')
 histz.write('xx iz[i]\n')
@@ -309,19 +309,19 @@ for ip in range(n_p-1):
     correlations2_cool.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ip*a, x2cool_av[ip], x2cool_er[ip], dx2c[ip], dxe2c[ip]))
     correlations3_cool.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ip*a, x3cool_av[ip], x3cool_er[ip], dx3c[ip], dxe3c[ip]))
 
-for ic in range(ncool+1):
+'''for ic in range(ncool+1):
     instdensity.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ic, nin_av[ic], nin_er[ic], de*tmax, de2*tmax))
-
+'''
 for ic in range(ncool+1):    
     sin = nin_av[ic]*s0
     coolingsweeps.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ic, scool_av[ic], scool_er[ic], sin))
-
+'''
 for ic in range(ncool+1):
     si_av= scool_av[ic]/nin_av[ic]                    
     del2 =(scool_er[ic]/scool_av[ic])**2+(nin_er[ic]/nin_av[ic])**2
     si_er= si_av*np.sqrt(del2)
     inst_action.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ic, si_av, si_er, s0))
-    
+ '''   
 for i in range(nzhist): 
     xx = (i+0.5)*stzhist
     histz.write("{:.4f}\t{}\n".format(xx, iz[i]))
@@ -336,7 +336,7 @@ correlations2.close()
 correlations2_cool.close()
 correlations3.close()
 correlations3_cool.close()
-instdensity.close()
+#instdensity.close()
 coolingsweeps.close()
-inst_action.close()
+#inst_action.close()
 histz.close()

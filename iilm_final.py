@@ -22,7 +22,7 @@ def setting_inputs():
     return f, n, a, neq, nmc, dx, n_p, nc, kp, N_tot, tcore, acore, dz, seed
 
 f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, tcore, score, dz, seed = setting_inputs()
-random.seed(seed)
+#random.seed(seed)
 '''----------Definitions-------------------------------------------------------'''
 pi    = np.pi
 tcore = tcore/f

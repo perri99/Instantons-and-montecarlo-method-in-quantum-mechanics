@@ -631,6 +631,20 @@ plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--', label = '1-lo
 y = l2(x)
 plt.plot(x, y, color = 'green', linewidth = 0.8, label = '2-loop')
 
+with open('Data/qmidens/density.dat') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x     = np.array(column1)
+y     = np.array(column2)
+y_err  = np.array(column3)
+
+plt.errorbar(x, y, yerr = y_err, fmt='v',markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = 'qmidens')
+#--------------------------------    
 with open('Data/qmdiag/splitting.dat') as file:
     lines = file.readlines()[1:]
 column1 = [float(line.split()[0]) for line in lines]
@@ -640,7 +654,7 @@ x     = np.array(column1)
 y     = np.array(column2)
 
 plt.plot(x, y/2, color = 'black', linewidth = 0.8)
-
+#----------------------------------------
 with open('Data/qmcool/instdensity_varf.dat') as file:
     lines = file.readlines()
 column1 = [float(line.split()[0]) for line in lines]
@@ -652,12 +666,16 @@ y     = np.array(column2)
 y_err  = np.array(column3)
 
 plt.errorbar(x, y/40, yerr = y_err/40, fmt='s',markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5)
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'qmcool')
 plt.yscale('log')
 plt.ylim(0.01, 3.1)
-plt.xlim(0, 1.75)
+plt.xlim(0, 1.85)
+plt.legend()
+plt.xlabel('f')
+plt.ylabel('N_top/\u03B2')
 plt.savefig('Data/fig8.pdf')
 plt.savefig('Data/fig8.png')
+
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 9: Quantum mechanical paths which appear in a Monte-Carlo calculation
