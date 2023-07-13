@@ -25,11 +25,44 @@ def initialize_param():
 
 @nb.jit(nopython = True)
 def normalization(x,dx):
+    '''
+    returns an array normalized to one
+    Parameters:
+           x: array-like
+           dx: floating type
+    Return:     
+           x/norm: array-like
+    '''
     norm = np.sqrt(np.sum(x**2 * dx))
     return x/norm
 
 @nb.jit(nopython = True)
-def solve_schroedinger(mass: nb.float64, x: nb.float64[:], V: nb.float64[:], Step: nb.float64,point_num: nb.float64) -> nb.types.Tuple((nb.float64[:], nb.float64[:, :])):
+def solve_schroedinger(mass, x, V, Step,point_num):
+    '''
+    solve schrodinger equation in one dimension for the potential V
+    for one particle
+    Parameters
+    ----------
+    mass : float
+        particle mass.
+    x : array(float)
+        1d lattice space.
+    V : array(float)
+        value of potential in x.
+    Step : float
+        lattice discretization.
+    point_num : int
+        number of point in the lattice.
+
+    Returns
+    -------
+    EigValues : array(float)
+        Eigenvalues of the system (sorted).
+    EigVectors : 2d-array(float)
+        Matrix containing eigenvectors in position space
+        EigVectors[j,n] = <x_j|n>.
+
+    '''
     DiagConst = 2.0 / (2.0*mass*Step*Step)
     NondiagConst =  -1.0 / (2.0*mass*Step*Step)
     #Setting up tridiagonal matrix and find eigenvectors and eigenvalues

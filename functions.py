@@ -1,36 +1,107 @@
 import numpy as np
+import os
 import random
 import numba as nb
 #------------------------------------------------------------------------------|
-'''Functions needed in qm.py, qmswitch.py, qmcool.py, qmidens.py
-    rilm.py, rilmgauss.py, iilm.py'''
+'''
+Functions needed in qm.py, qmswitch.py, qmcool.py, qmidens.py
+    rilm.py, rilmgauss.py, iilm.py
+'''
 #------------------------------------------------------------------------------|
 #-------------------------------------------------------------------------------------|
-#      normalization(x,dx): it returns an array normalized to 1, dx is lattice spacing
-'''Inputs:        x: array-like
-                 dx: floating type
-   Output:   x/norm: array-like'''
+def directory(name):
+    '''
+    check if 'Data/name' directory exists. If not create it
+
+    Parameters
+    ----------
+    name : string
+        subfolder name.
+
+    Returns
+    -------
+    None.
+
+    '''
+    data_folder = 'Data'
+    subfolder = name 
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+    folder_path = os.path.join(data_folder, subfolder)
+    if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+#---------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------       
 @nb.jit(nopython = True)
 def normalization(x,dx):
+    '''
+    returns an array normalized to 1
+    Parameters:
+        x: array-like
+        dx: floating type
+    Return:     
+        x/norm: array-like
+    '''
     norm = np.sqrt(np.sum(x**2 * dx))
     return x/norm
 #-------------------------------------------------------------------------------------|
 #------------------------------------------------------------------------------|
 @nb.jit(nopython = True)
 def new_config(x,n,N_inst, z, f, a):
+    '''
+    
+
+    Parameters
+    ----------
+    x : TYPE
+        DESCRIPTION.
+    n : TYPE
+        DESCRIPTION.
+    N_inst : TYPE
+        DESCRIPTION.
+    z : TYPE
+        DESCRIPTION.
+    f : TYPE
+        DESCRIPTION.
+    a : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    x : TYPE
+        DESCRIPTION.
+
+    '''
     for j in range(1,n):
         t = a*j
         x[j] = sum_ansatz_path(N_inst, z, f, t)
     x[0] = x[n-1]
     x[n] = x[1]
     return x
-
-#----------------------------------------------------------
-'''
-Function action: computes the action of a given configuration
-'''
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def action(x,n,a,f): #total action of a given configuration
+def action(x,n,a,f): 
+    '''
+    total euclidean action of configuration x
+
+    Parameters
+    ----------
+    x : array(float)
+        configuration array.
+    n : int
+        number of lattice point.
+    a : float
+        lattice discretization.
+    f : float
+        double well separation.
+
+    Returns
+    -------
+    S : float
+        euclidean action.
+
+    '''
     S = kinetic(x, n, a) + potential(x, n, a, f)
     return S
 #-----------------------------------------------------------
@@ -122,23 +193,63 @@ def hardcore_interaction(z, nin, tcore, score, tmax, s0):
         dz = z[i] - zm
         shc = shc + score * np.exp(-dz/tcore)
     return shc
-
+#----------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def periodic_starting_conf(n, f,mode): 
+def periodic_starting_conf(n, f,mode):
+    '''
+    initialize the starting configuration array. if mode == 0 cold start, all elements\
+        are initialize to -f otherwise uniform distribution between -f+f(hot start).\
+            periodic boundary conditions are implemented
+
+    Parameters
+    ----------
+    n : int
+        lattice points.
+    f : float
+        position of minimum potential.
+    mode : int
+        0 == cold start, otherwise hot start.
+
+    Returns
+    -------
+    x : array(float)
+        initial configuration of dimension n+1.
+
+    '''
     x = np.zeros(n)
     if mode == 0: #cold start
-        for i in range(n):
-            x[i] = -f
+        x = np.full(n, -f)
     else:
-        for i in range(n): #hot start
-            x[i] = 2*random.random()*f-f
+        x = np.random.uniform(-f,f,size = n) #hotstart
     #periodic boundary condition
     x[n-1] = x[0]
     x = np.append(x,x[1])
     return x
-
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def periodic_update(x,n,a,f,dx):
+    '''
+    
+
+    Parameters
+    ----------
+    x : TYPE
+        DESCRIPTION.
+    n : TYPE
+        DESCRIPTION.
+    a : TYPE
+        DESCRIPTION.
+    f : TYPE
+        DESCRIPTION.
+    dx : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    x : TYPE
+        DESCRIPTION.
+
+    '''
     for j in range(1,n):
         S_old = action_localc(x[j], x[j-1], x[j+1], n, a, f)
         xnew  = x[j] + dx*(2.0*random.random()-1.0)
@@ -148,7 +259,7 @@ def periodic_update(x,n,a,f,dx):
         delta_S = max(delta_S, -70.0)
         if np.exp(-delta_S) > random.random():
             x[j] = xnew
-    x[0] = x[n-1]
+    x[n-1] = x[0]
     x[n] = x[1]
     return x
 
@@ -209,7 +320,7 @@ def update_periodic(x, n, a, f, dx): #metropolis alghorhitm
 
 @nb.jit(nopython = True)
 def update_periodic_switch(x,n,a,f, w0, alpha, dx): #metropolis alghorhitm for adiabatic switching
-    for j in range(1,n):
+    for j in range(n):
         S_old = action_switch_local(x, j, n, a, f, w0, alpha)
         x_old = x[j]
         x[j]  = x[j] + dx*(2.0*random.random()-1.0)
@@ -225,6 +336,28 @@ def update_periodic_switch(x,n,a,f, w0, alpha, dx): #metropolis alghorhitm for a
 
 @nb.jit(nopython = True)
 def cooling_update(xs,n,a,f,dx):
+    '''
+    metropolis algorithm for cooling. we accept only update which lower the action 
+
+    Parameters
+    ----------
+    xs : array(float)
+        initial configuration.
+    n : int
+        number of lattice poits.
+    a : float
+        lattice discretization.
+    f : float
+        double well separation.
+    dx : float
+        update width.
+
+    Returns
+    -------
+    xs : array(float)
+        cooled configuration.
+
+    '''
     nhit2 = 10
     delxp= 0.1*dx
     for j in range(1,n):

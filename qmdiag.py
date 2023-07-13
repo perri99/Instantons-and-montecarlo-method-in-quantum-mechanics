@@ -1,17 +1,11 @@
 import numpy as np
-import os
 import schroedinger as sc
+from functions import directory
 from tqdm import tqdm
 import matplotlib.pyplot as plt
  
 #------------------------output files------------------------------------|
-data_folder = 'Data'
-subfolder = 'qmdiag' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+directory('qmdiag')
 write_groundstate = open('Data/qmdiag/ground_state1_doublewell.dat', 'w')
 write_eigenvalues = open('Data/qmdiag/eigenvalues_doublewell.dat', 'w')
 cor = open('Data/qmdiag/cor.dat', 'w')

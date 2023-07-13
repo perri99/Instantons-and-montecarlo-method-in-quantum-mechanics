@@ -16,7 +16,7 @@ with open('Data/qmcool/config2.dat', 'r') as file:
 start_line = None
 end_line   = None
 for i, line in enumerate(lines):
-    if line.startswith('configuration: 355'):
+    if line.startswith('configuration: 4450'):
         start_line = i
         break
 data_lines = lines[start_line+1: start_line+801]
@@ -34,7 +34,7 @@ with open('Data/qmcool/config_cool.dat', 'r') as file:
 start_line = None
 end_line   = None
 for i, line in enumerate(lines):
-    if line.startswith('configuration: 355'):
+    if line.startswith('configuration: 4450'):
         start_line = i
         break
 data_lines = lines[start_line+1: start_line+801]
@@ -48,7 +48,8 @@ plt.plot(x, y, color = 'red',linewidth = 1.7, label = 'cooling')
 plt.legend()
 plt.xlabel('time t')
 plt.ylabel('x(t)')
-plt.title('Typical configuration')
+plt.xlim(0,20)
+#plt.title('Typical configuration')
 plt.savefig('Data/qmcool/config.pdf')
 plt.savefig('Data/qmcool/config.png')
 plt.show()
@@ -80,7 +81,7 @@ plt.plot(x, y, color = 'blue', drawstyle = 'steps', label = 'Monte Carlo' )
 plt.xlabel('x')
 plt.ylabel('P(x)')
 plt.legend()
-plt.title('Probability distribution |\u03C8|\u00B2')
+#plt.title('Probability distribution |\u03C8|\u00B2')
 plt.savefig('Data/qm/probability distribution.pdf')
 plt.savefig('Data/qm/probability distribution.png')
 plt.show()
@@ -124,7 +125,7 @@ plt.plot(x, y, color = 'black')
 
 
 with open('Data/qm/correlations_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -137,7 +138,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'blue', markersize=8, capsize=5, label = '<x(0)x(τ)>')
 
 with open('Data/qm/correlations2_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -150,7 +151,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = '<x^2(0)x^2(τ)>')
 
 with open('Data/qm/correlations3_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -162,7 +163,7 @@ y_err = np.array(column3)
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
 plt.legend()
-plt.title('Correlation functions')
+#plt.title('Correlation functions')
 plt.xlim(0, 1.5)
 plt.xlabel('time')
 plt.ylabel('<x^n(0)x^n(τ)>')
@@ -192,7 +193,7 @@ y = np.array(column4)
 plt.plot(x, y, color = 'black')
 
 with open('Data/qm/correlations_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -205,7 +206,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'blue', markersize=8, capsize=5, label = 'dlog<x(0)x(τ)>')
 
 with open('Data/qm/correlations2_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -218,7 +219,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 
 with open('Data/qm/correlations3_qm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -232,7 +233,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
 plt.legend()
 plt.ylim(0, 6)
 plt.xlim(0, 1)
-plt.title('Logarithmic derivatives of correlation functions')
+#plt.title('Logarithmic derivatives of correlation functions')
 plt.xlabel('time')
 plt.ylabel('dlog<x^n(0)x^n(τ)>')
 plt.savefig('Data/qm/dlog.pdf')
@@ -269,10 +270,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
 
 plt.xlabel('T')
 plt.ylabel('F')
-plt.title('Free energy of anharmonic oscillator')
+#plt.title('Free energy of anharmonic oscillator')
 plt.xscale('log')
 plt.xlim(0.01,2.5)
-plt.ylim(-2.5, -1)
+plt.ylim(-4, 0)
+plt.savefig('Data/qmswitch/free_energy.pdf')
+plt.savefig('Data/qmswitch/free_energy.png')
 plt.show()
 
 #------------------------------------------------------------------------------
@@ -353,7 +356,7 @@ y_err = np.array(column3)
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
 plt.legend()
-plt.title('Cooled correlation functions')
+#plt.title('Cooled correlation functions')
 plt.xlim(0, 1)
 plt.ylim(0,8)
 plt.xlabel('time')
@@ -437,12 +440,22 @@ plt.show()
 #   sweeps for different values of the parameter η
 #------------------------------------------------------------------------------
 with open('Data/qmcool/instdensity.dat', 'r') as file:
-    lines = file.readlines()[2:]
+    lines = file.readlines()
 
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-column3 = [float(line.split()[3]) for line in lines]
-column4 = [float(line.split()[4]) for line in lines]
+start_line = None
+end_line   = None
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.4'):
+        start_line = i
+    elif line.startswith('f = 1.5'):
+        end_line = i
+        break
+data_lines = lines[start_line+2: end_line-1]
+
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[3]) for line in data_lines]
+column4 = [float(line.split()[4]) for line in data_lines]
 x     = np.array(column1)
 y     = np.array(column2)/(n*a)
 
@@ -456,14 +469,63 @@ plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--', label = '2-lo
 y     = np.array(column4)/(n*a)
 plt.plot(x, y, color = 'green', linewidth = 0.8, label = '1-loop')
 
+#-------------------------------------------------------------------------------
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.5'):
+        start_line = i
+    elif line.startswith('f = 1.6'):
+        end_line = i
+        break
+data_lines = lines[start_line+2: end_line-1]
+
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[3]) for line in data_lines]
+column4 = [float(line.split()[4]) for line in data_lines]
+x     = np.array(column1)
+y     = np.array(column2)/(n*a)
+
+
+plt.errorbar(x, y, fmt ='o', markerfacecolor = 'none',
+             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = 'f = 1.5')
+
+y     = np.array(column3)/(n*a)
+plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--')
+
+y     = np.array(column4)/(n*a)
+plt.plot(x, y, color = 'green', linewidth = 0.8)
+#--------------------------------------------------------------------------------
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.6'):
+        start_line = i
+        break
+data_lines = lines[start_line+2:]
+
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[3]) for line in data_lines]
+column4 = [float(line.split()[4]) for line in data_lines]
+x     = np.array(column1)
+y     = np.array(column2)/(n*a)
+
+
+plt.errorbar(x, y, fmt ='v', markerfacecolor = 'none',
+             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = 'f = 1.6')
+
+y     = np.array(column3)/(n*a)
+plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--')
+
+y     = np.array(column4)/(n*a)
+plt.plot(x, y, color = 'green', linewidth = 0.8)
 plt.xlabel('n_cool')
 plt.ylabel('N_top/\u03B2')
 plt.title('Instanton density')
-
 plt.xscale('log')
 plt.yscale('log')
 plt.xlim(1, )
 plt.legend()
+plt.savefig('Data/qmcool/instdensity.pdf')
+plt.savefig('Data/qmcool/instdensity.png')
 plt.show()
 
 #------------------------------------------------------------------------------
@@ -471,23 +533,75 @@ plt.show()
 #   sweeps for different values of the parameter eta
 #------------------------------------------------------------------------------
 with open('Data/qmcool/inst_action.dat', 'r') as file:
-    lines = file.readlines()[2:]
+    lines = file.readlines()
 
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-column3 = [float(line.split()[2]) for line in lines]
-column4 = [float(line.split()[3]) for line in lines]
+start_line = None
+end_line   = None
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.4'):
+        start_line = i
+    elif line.startswith('f = 1.5'):
+        end_line = i
+        break
+data_lines = lines[start_line+2: end_line-1]
+
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[2]) for line in data_lines]
+column4 = [float(line.split()[3]) for line in data_lines]
 x     = np.array(column1)
 y     = np.array(column2)
 y_err = np.array(column3)
 
 plt.errorbar(x, y, yerr=y_err, fmt='s',markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'η = 1.4')
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.4')
 
 y     = np.array(column4)
 
 plt.plot(x, y, color='green', linewidth = 0.8, label= 'classical')
+#---------------------------------------------------------------------------------
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.5'):
+        start_line = i
+    elif line.startswith('f = 1.6'):
+        end_line = i
+        break
+data_lines = lines[start_line+2: end_line-1]
 
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[2]) for line in data_lines]
+column4 = [float(line.split()[3]) for line in data_lines]
+x     = np.array(column1)
+y     = np.array(column2)
+y_err = np.array(column3)
+
+plt.errorbar(x, y, yerr=y_err, fmt='o',markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.5')
+
+y     = np.array(column4)
+
+plt.plot(x, y, color='green', linewidth = 0.8)
+#----------------------------------------------------------------------------------
+for i, line in enumerate(lines):
+    if line.startswith('f = 1.6'):
+        start_line = i
+        break
+data_lines = lines[start_line+2:]
+column1 = [float(line.split()[0]) for line in data_lines]
+column2 = [float(line.split()[1]) for line in data_lines]
+column3 = [float(line.split()[2]) for line in data_lines]
+column4 = [float(line.split()[3]) for line in data_lines]
+x     = np.array(column1)
+y     = np.array(column2)
+y_err = np.array(column3)
+
+plt.errorbar(x, y, yerr=y_err, fmt='v',markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.6')
+
+y     = np.array(column4)
+
+plt.plot(x, y, color='green', linewidth = 0.8)
 plt.xlabel('n_cool')
 plt.ylabel('S/N_inst')
 plt.title('Action per instanton')
@@ -500,10 +614,56 @@ plt.savefig('Data/qmcool/inst_action.pdf')
 plt.savefig('Data/qmcool/inst_action.png')
 plt.show()
 #------------------------------------------------------------------------------
+#   FIG. 8: Instanton density as a function of the parameter f.
+#------------------------------------------------------------------------------
+def l1(x):
+    return 8*x**(5/2)*np.sqrt(2/np.pi)*np.exp(-4/3*x**3)
+def l2(x):
+    return 8*x**(5/2)*np.sqrt(2/np.pi)*np.exp(-4/3*x**3-71/72*1/(4/3*x**3))
+def dE(x):
+    return np.sqrt((6*(4/3)*x**3)/np.pi)*4*x*np.exp(-4/3*x**3)
+
+x = np.linspace(0.02, 2, 100)
+y = l1(x)
+
+plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--', label = '1-loop')
+
+y = l2(x)
+plt.plot(x, y, color = 'green', linewidth = 0.8, label = '2-loop')
+
+with open('Data/qmdiag/splitting.dat') as file:
+    lines = file.readlines()[1:]
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+x     = np.array(column1)
+y     = np.array(column2)
+
+plt.plot(x, y/2, color = 'black', linewidth = 0.8)
+
+with open('Data/qmcool/instdensity_varf.dat') as file:
+    lines = file.readlines()
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x     = np.array(column1)
+y     = np.array(column2)
+y_err  = np.array(column3)
+
+plt.errorbar(x, y/40, yerr = y_err/40, fmt='s',markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5)
+plt.yscale('log')
+plt.ylim(0.01, 3.1)
+plt.xlim(0, 1.75)
+plt.savefig('Data/fig8.pdf')
+plt.savefig('Data/fig8.png')
+plt.show()
+#------------------------------------------------------------------------------
 #   FIG. 9: Quantum mechanical paths which appear in a Monte-Carlo calculation
 #   of the one-instanton partition function in the double well potential.
 #------------------------------------------------------------------------------
-for i in range(4):
+for i in range(3):
     with open('Data/qmidens/idens_conf.dat', 'r') as file:
         lines = file.readlines()[i*n+1:(i+1)*n]
 
@@ -915,7 +1075,7 @@ column2 = [float(line.split()[1]) for line in lines]
 x     = np.array(column1)
 y     = np.array(column2)
 
-plt.plot(x, y, color = 'red')
+plt.plot(x, y, color = 'red', label= 'random')
 
 with open('Data/iilm/zdist.dat', 'r') as file:
     lines = file.readlines()[1:]
@@ -926,13 +1086,14 @@ column2 = [float(line.split()[1]) for line in lines]
 x     = np.array(column1)
 y     = np.array(column2)
 
-plt.plot(x, y, color = 'black', drawstyle = 'steps')
+plt.plot(x, y, color = 'black', drawstyle = 'steps', label = 'interactive')
 
 plt.xlabel('τ_z')
 plt.ylabel('n_IA(τ_z)')
 plt.title('Istanton-anti-istanton separation distribution')
 plt.xlim(0,3.85)
 plt.ylim(0,40000)
+plt.legend()
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.pdf')
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.png')
 plt.show()

@@ -2,7 +2,7 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-import os
+
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -11,10 +11,10 @@ def setting_inputs():
     neq = 100 #number of equilibration sweeps
     nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
+    n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
+    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
     seed = 597
     return f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed
 
@@ -23,13 +23,7 @@ f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed = setting_inputs()
 tmax = n*a
 random.seed(seed)
 #-----output files--------------------------------------------------|
-data_folder = 'Data'
-subfolder = 'qm' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+fn.directory('qm')
         
 config1 = open('Data/qm/config1.dat', 'w')
 config1.write('configuration, Action, Kinetic, Potential\n')
@@ -91,7 +85,7 @@ histo_x    = np.zeros(nxhist)
 x = fn.periodic_starting_conf( n, f, mode)
 #---------montecarlo generations--------------------------------|
 for i in tqdm(range(nmc)):
-    x = fn.update_periodic(x,n,a,f, dx)  #metropolis algorithm implementation with periodic boundary conditions
+    x = fn.periodic_update(x,n,a,f, dx)  #metropolis algorithm implementation with periodic boundary conditions
     if i < neq:
         continue
     nconf += 1

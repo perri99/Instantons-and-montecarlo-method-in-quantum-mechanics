@@ -2,19 +2,18 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-import os
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
     n = 800 #lattice points
     a = 0.05 #lattice spacing
     neq = 100 #number of equilibration sweeps
-    nmc = 10**3 #number of MonteCarlo sweeps
+    nmc = 10**4 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
     n_alpha = 20 #number of switch
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
+    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
     seed = 597
     w0 = 5.6
     return f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
@@ -24,13 +23,7 @@ f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
 random.seed(seed)
 
 #output files
-data_folder = 'Data'
-subfolder = 'qmswitch' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+fn.directory('qmswitch')
         
 switch = open('Data/qmswitch/switch.dat','w')
 switch.write('montecarlo switch\n ----- \n')
@@ -62,14 +55,13 @@ x2_sum = 0
 x4_sum = 0
 x8_sum = 0
 #-----Array defnitions-----------------------------------------------|
-x = np.zeros(n)
-Va_av = np.zeros(2*n_alpha+1)
-Va_err = np.zeros(2*n_alpha+1)
+Va_av = np.zeros(2*n_alpha)
+Va_err = np.zeros(2*n_alpha)
 #starting configuration-----------------------------------------|
-x = fn.periodic_starting_conf(x, n, f, mode)
+x = fn.periodic_starting_conf(n, f, mode)
 S, V, P = fn.compute_energy_switch(x, n, a, f, w0, 0)
 #--------loop over coupling constant alpha-------------------------------------|
-for ialpha in tqdm(range(2 * n_alpha + 1)):
+for ialpha in tqdm(range(2 * n_alpha)):
     if ialpha <= n_alpha:
         alpha = ialpha * dalpha  #da 0 a 1
     else:
