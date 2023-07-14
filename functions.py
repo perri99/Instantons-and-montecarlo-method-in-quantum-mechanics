@@ -81,6 +81,37 @@ def new_config(x,n,N_inst, z, f, a):
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 @nb.jit(nopython = True)
+def sum_ansatz_path(N_inst, z, f,t):
+    '''
+    
+
+    Parameters
+    ----------
+    N_inst : TYPE
+        DESCRIPTION.
+    z : TYPE
+        DESCRIPTION.
+    f : TYPE
+        DESCRIPTION.
+    t : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    xsum : TYPE
+        DESCRIPTION.
+
+    '''
+    neven = N_inst - (N_inst % 2)
+    xsum = -f
+    for i in range(0, neven, 2):
+        xsum += f * np.tanh(2.0 * f * (t - z[i])) - f * np.tanh(2.0 * f * (t - z[i+1]))
+    if N_inst % 2 != 0:
+        xsum += f * np.tanh(2.0 * f * (t - z[N_inst])) + f   
+    return xsum
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+@nb.jit(nopython = True)
 def action(x,n,a,f): 
     '''
     total euclidean action of configuration x
@@ -109,51 +140,61 @@ def action(x,n,a,f):
 @nb.jit(nopython = True)
 def action_fluctuations(x,x0,w,vi, n,f,a, alpha):
     return kinetic(x, n, a) + fluctuations_total_potential(x, x0, w, vi, f, a, alpha, n)    
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def V0(x,x0,w,vi,j):
     return 1.0/2.0 * w[j] * (x[j]-x0[j])**2 + vi[j]
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def delta_V(x,x0,w,vi,f,a, n):
     delta_V = 0
     for j in range(n):
         delta_V += (x[j]**2-f**2)**2 - V0(x, x0, w, vi, j)
     return a*delta_V
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_switch(x,n,a,w0,f,alpha):
     S_switch = kinetic(x, n, a) + potential_switch(x, n, a, f, w0, alpha)
     return S_switch
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_local(x, j, n, a, f): #contribution to the action from the j-th point of configuration
     return (1/(4*a))*(x[j]-x[j-1])**2+a*(x[j]**2-f**2)**2 + (1/(4*a))*(x[j+1]-x[j])**2
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def kinetic(x,n,a):
     K = 0
     for j in range(n):
         K += (1/(4*a))*(x[j+1]-x[j])**2
     return K
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def kinetic_local(x,y,a): 
     K = (1/(4*a))*(x-y)**2
     return K
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_gauss(w,x,y,a):
     return 0.5*w*a*(x-y)**2
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def harmonic_potential(x,w0):
     return (1/4) * x**2 * w0**2    #mass = 0.5
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_switch_local(x, j, n, a, f, w0, alpha):
     return (1/(4*a))*(x[j+1]-x[j])**2 + (1/(4*a))*(x[j]-x[j-1])**2 + a*(alpha*((x[j]**2-f**2)**2-harmonic_potential(x[j], w0)) + harmonic_potential(x[j], w0)) 
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential(x,n,a,f):
     V = 0
@@ -161,39 +202,44 @@ def potential(x,n,a,f):
         if x is not None:
             V += a*(x[j]**2-f**2)**2
     return V
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_switch_local(x, j, n, a, f, w0, alpha):
     return a*(alpha*((x[j]**2-f**2)**2-harmonic_potential(x[j], w0)) + harmonic_potential(x[j], w0))
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_switch(x, n, a, f, w0, alpha):
     V_switch = 0
     for j in range(n):
         V_switch += potential_switch_local(x, j, n, a, f, w0, alpha)
     return V_switch
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_diff(x, n, a, f, w0):
     V_diff = 0
     for j in range(n):
         V_diff += a*((x[j]**2-f**2)**2-harmonic_potential(x[j], w0))
     return V_diff
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def hardcore_interaction(z, nin, tcore, score, tmax, s0):
-    shc = 0.0
+    hardcore_action = 0.0
     if tcore == 0:
-        return shc
+        return hardcore_action 
     for i in range(nin):
         if i == 0:
             zm = z[-1] - tmax
         else:
             zm = z[i-1]
         dz = z[i] - zm
-        shc = shc + score * np.exp(-dz/tcore)
-    return shc
-#----------------------------------------------------------------------------------
+        hardcore_action += score * np.exp(-dz/tcore)
+    return hardcore_action
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def periodic_starting_conf(n, f,mode):
     '''
@@ -225,6 +271,7 @@ def periodic_starting_conf(n, f,mode):
     x[n-1] = x[0]
     x = np.append(x,x[1])
     return x
+#---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def periodic_update(x,n,a,f,dx):
@@ -262,9 +309,31 @@ def periodic_update(x,n,a,f,dx):
     x[n-1] = x[0]
     x[n] = x[1]
     return x
-
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def initialize_instanton(n,a, f, tau0):
+    '''
+    create a one instanton classical solution. Instanton is placed in tau0, \
+        anti periodic boundary conditions are used.
+
+    Parameters
+    ----------
+    n : int
+        lattice points.
+    a : float
+        lattice discretization.
+    f : float
+        location of minimum of double well.
+    tau0 : float
+        instanton location.
+
+    Returns
+    -------
+    x : array(float)
+        classical instanton configuration.
+
+    '''
     x = np.zeros(n)
     for i in range(n):
         tau   = i*a
@@ -273,16 +342,35 @@ def initialize_instanton(n,a, f, tau0):
     x[n-1] = -x[0]
     x  = np.append(x, -x[1])
     return x
-
+#-----------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def initialize_vacuum(n,f):
+    '''
+    initialize a vacuum solution. Particle is placed in x = +f,\
+         periodic boundary conditions are used.
+
+    Parameters
+    ----------
+    n : int
+        lattice points.
+    f : float
+        location of minimum of double well.
+
+    Returns
+    -------
+    x : array float
+        vacuum configuration.
+
+    '''
     x = np.zeros(n)
     for i in range(n):
         x[i] = f
     x[0] = x[n-1]
     x = np.append(x,x[1])
     return x
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def compute_energy(x,n, a ,f):
     V = potential(x,n, a, f)
@@ -293,7 +381,8 @@ def compute_energy(x,n, a ,f):
         tv = 2.0*x[j]**2*(x[j]**2-f**2)
         tvtot += a*tv
     return S, V, T, tvtot
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def compute_energy_switch(x,n, a ,f, w0, alpha):
     V = potential_switch(x, n, a, f, w0, alpha)
@@ -301,7 +390,8 @@ def compute_energy_switch(x,n, a ,f, w0, alpha):
     S = V + T
     P = potential_diff(x, n, a, f, w0)
     return S, V, P
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_periodic(x, n, a, f, dx): #metropolis alghorhitm
     for j in range(1,n):
@@ -317,7 +407,8 @@ def update_periodic(x, n, a, f, dx): #metropolis alghorhitm
     x[n-1] = x[0]
     x[n] = x[1]
     return x
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_periodic_switch(x,n,a,f, w0, alpha, dx): #metropolis alghorhitm for adiabatic switching
     for j in range(n):
@@ -333,11 +424,13 @@ def update_periodic_switch(x,n,a,f, w0, alpha, dx): #metropolis alghorhitm for a
     x[n-1] = x[0]
     x[n] = x[1]
     return x
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def cooling_update(xs,n,a,f,dx):
     '''
-    metropolis algorithm for cooling. we accept only update which lower the action 
+    metropolis algorithm for cooling: only updates which lower the action \
+        are accepted
 
     Parameters
     ----------
@@ -358,7 +451,7 @@ def cooling_update(xs,n,a,f,dx):
         cooled configuration.
 
     '''
-    nhit2 = 10
+    nhit2 = 10  #number of updatig trials
     delxp= 0.1*dx
     for j in range(1,n):
         Sold2 = action_localc(xs[j], xs[j-1], xs[j+1], n, a, f)
@@ -368,7 +461,8 @@ def cooling_update(xs,n,a,f,dx):
             if Snew2 < Sold2:
                 xs[j] = xnew2
     return xs
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def heating_update(x_hot, x, n, nheat, a, f, dx):
     w = -4.0*(f**2-3.0*x**2)
@@ -391,25 +485,27 @@ def heating_update(x_hot, x, n, nheat, a, f, dx):
         x_hot[n-1]= x_hot[0]
         x_hot[n]  = x_hot[1]
     return x_hot
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_localc(xj, xjm, xjp, n, a, f): #contribution to the action from the j-th point of configuration
     return (1/(4*a))*(xj-xjm)**2 + a*(xj**2-f**2)**2 + (1/(4*a))*(xjp-xj)**2
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def fluctuations_potential(x,x0,w,vi,f,a, alpha, j):
     delta_V = (x[j]**2-f**2)**2 - V0(x, x0, w, vi, j)
     return a*(alpha*delta_V + V0(x, x0, w, vi, j))
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def fluctuations_total_potential(x,x0,w,vi,f,a, alpha, n):
     V = 0
     for j in range(n):
         V += fluctuations_potential(x, x0, w, vi, f, a, alpha, j)
     return  V
-
-
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_instanton(x, x0, w, vi, n, a, f, alpha, dx):
     n0     = n/2
@@ -442,7 +538,8 @@ def update_instanton(x, x0, w, vi, n, a, f, alpha, dx):
     x[0] = -x[n-1]
     x[n] = -x[1]
     return x
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
     for iin in range(nin):
@@ -463,8 +560,7 @@ def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
         #----------------------------------------------------------------------
         x = new_config(x, n, nin, z, f, a)
         snew = action(x, n, a, f)
-        shc = hardcore_interaction(z, nin, tcore, score, tmax, s0)
-        snew += shc
+        snew +=hardcore_interaction(z, nin, tcore, score, tmax, s0)
         
         #----------------------------------------------------------------------
         #   accept with probability exp(-delta S)                                  
@@ -473,8 +569,8 @@ def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
         if np.exp(-dels) <= random.random() :
             z = np.copy(zstore)
     return z, x
-
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_vacuum(x,x0,w,vi,n,a,f,alpha,dx):
     for j in range(n):
@@ -490,7 +586,8 @@ def update_vacuum(x,x0,w,vi,n,a,f,alpha,dx):
     x[0] = x[n-1]
     x[n] = x[1]
     return x
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def dispersion(n, xtot, x2tot):
     if n < 1:
@@ -501,7 +598,8 @@ def dispersion(n, xtot, x2tot):
         sigma2 = 0      
     xerr = np.sqrt(sigma2)  
     return x_average, xerr
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def correlations_functions(x,n,n_p):
     xcor = np.zeros(n_p)
@@ -511,7 +609,8 @@ def correlations_functions(x,n,n_p):
             x1 = x[ip0+ip]  #scelto il punto di partenza vedo le correlazioni con i 20 successivi
             xcor[ip]  = x0*x1
     return xcor
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def correlations_functions_ipa(x,n,n_p):
     xcor = np.zeros(n_p)
@@ -521,7 +620,8 @@ def correlations_functions_ipa(x,n,n_p):
             x1 = x[ip0+ip]  #scelto il punto di partenza vedo le correlazioni con i 20 successivi
             xcor[ip]  = x0*x1
     return xcor, ip0
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def cool_correlations_functions(x, ip0, n, n_p):
     xcor_cool = np.zeros(n_p)
@@ -530,7 +630,8 @@ def cool_correlations_functions(x, ip0, n, n_p):
             x1_cool = x[ip0+ip]  #scelto il punto di partenza vedo le correlazioni con i 20 successivi
             xcor_cool[ip]  = x0_cool*x1_cool
     return xcor_cool
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def log_derivatives(x,err,a,n_p):
     dx = np.zeros(n_p-1)
@@ -541,7 +642,8 @@ def log_derivatives(x,err,a,n_p):
         + (err[ip]*x[ip+1]/x[ip]**2)**2 #error propagation squared
         dxe[ip]  = np.sqrt(dxe2)/a
     return dx, dxe
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def substract(x,err,n_p):
     x_sub = np.copy(x)
@@ -552,7 +654,8 @@ def substract(x,err,n_p):
         x_sub[ip] = x[ip]-xs 
         err_sub[ip] = np.sqrt(err[ip]**2+errs**2)
     return x_sub, err_sub       
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def histogramarray(x,n, xmin, st, m, hist):
     for k in range(n):
@@ -562,7 +665,8 @@ def histogramarray(x,n, xmin, st, m, hist):
         if (j > m):
             j = m
         hist[int(j)-1] += 1
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def histogramarray2(x, xmin, st, m, hist):
     j = (x - xmin)/st + 1.000001
@@ -571,7 +675,8 @@ def histogramarray2(x, xmin, st, m, hist):
     if (j > m):
         j = m
     hist[int(j)-1] += 1
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
     for ii in range(0, nin, 2):
@@ -583,7 +688,8 @@ def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
         zp  = z[ii+1]
         zia = min(zp-z0, z0-zm)    #chiedere info
         histogramarray2( zia, 0.0, stzhist, nzhist, iz)
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def building_wavefunction(hist, nxhist, stxhist, xhist_min):
     wave_function = np.zeros(nxhist)
@@ -595,7 +701,8 @@ def building_wavefunction(hist, nxhist, stxhist, xhist_min):
         position[i] = xhist_min + (i+1)*stxhist #spazzo tutto lo spazio dei bin
         wave_function[i] = hist[i]/xnorm
     return position, wave_function
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def summing(n_alpha, dalpha, Va_av, Va_err):
     eup_sum     = 0.0
@@ -624,17 +731,8 @@ def summing(n_alpha, dalpha, Va_av, Va_err):
         eup_hal += da * Va_av[ia]
         edw_hal += da * Va_av[iap]
     return eup_sum, eup_err, eup_hal, edw_sum, edw_err, edw_hal
-
-@nb.jit(nopython = True)
-def sum_ansatz_path(N_inst, z, f,t):
-    neven = N_inst - (N_inst % 2)
-    xsum = -f
-    for i in range(0, neven, 2):
-        xsum += f * np.tanh(2.0 * f * (t - z[i])) - f * np.tanh(2.0 * f * (t - z[i+1]))
-    if N_inst % 2 != 0:
-        xsum += f * np.tanh(2.0 * f * (t - z[N_inst])) + f   
-    return xsum
-
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def instantons(f, a, n, x, xi, xa, z):
     ni = 0
@@ -657,3 +755,88 @@ def instantons(f, a, n, x, xi, xa, z):
             z[nin] = tau                     
         p = ixp
     return ni, na
+#---------------------------------------------------------------------------------
+@nb.jit(nopython = True)
+def find_instantons(x, dt):
+    """Find the number of instantons and anti-instantons and save their
+    positions.
+
+    Parameters
+    ----------
+    x : ndarray
+        Spatial configuration.
+    dt : ndarray
+        Euclidean time axis.
+
+    Returns
+    -------
+    pos_roots : int
+        Number of instantons.
+    neg_roots : int
+        Number of anti-instantons.
+    a : array
+        Instanton positions.
+    b : array
+        Anti-instanton positions.
+    """
+    pos_roots = 0
+    neg_roots = 0
+    pos_roots_position = np.array([0.0])
+    neg_roots_position = np.array([0.0])
+    # pos_roots_position = []
+    # neg_roots_position = []
+
+    if np.abs(x[0]) < 1e-7:
+        x[0] = 0.0
+
+    x_pos = x[0]
+
+    for i in range(1, x.size - 1):
+        if np.abs(x[i]) < 1e-7:
+            x[i] = 0.0
+
+            if x_pos > 0.:
+                neg_roots += 1
+                neg_roots_position = np.append(
+                    neg_roots_position,
+                    -x_pos * dt
+                    / (x[i] - x_pos) + (i - 1) * dt
+                )
+            elif x_pos < 0.:
+                pos_roots += 1
+                pos_roots_position = np.append(
+                    pos_roots_position,
+                    -x_pos * dt
+                    / (x[i] - x_pos) + dt * (i - 1)
+                )
+            else:
+                continue
+
+        elif x_pos * x[i] < 0.:
+
+            if x[i] > x_pos:
+                pos_roots += 1
+                pos_roots_position = np.append(
+                    pos_roots_position,
+                    -x_pos * dt
+                    / (x[i] - x_pos) + dt * (i - 1)
+                )
+
+            elif x[i] < x_pos:
+                neg_roots += 1
+                neg_roots_position = np.append(
+                    neg_roots_position,
+                    -x_pos * dt
+                    / (x[i] - x_pos) + (i - 1) * dt
+                )
+
+        x_pos = x[i]
+
+    if neg_roots == 0 or pos_roots == 0:
+        return 0, 0, np.zeros(1), np.zeros(1)
+
+    a = np.delete(pos_roots_position, 0)
+    b = np.delete(neg_roots_position, 0)
+
+    return pos_roots, neg_roots, \
+           a, b

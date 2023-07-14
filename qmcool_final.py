@@ -15,7 +15,7 @@ def setting_inputs():
     neq = 100 #number of equilibration sweeps
     nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
+    n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
     mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random

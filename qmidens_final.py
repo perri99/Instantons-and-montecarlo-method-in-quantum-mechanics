@@ -47,23 +47,16 @@ s0   = 4.0/3.0*f**3     #classical action for instanton solution
 dens = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0)   #unperturbed tunneling rate
 f0   = dens
 #---------opening files--------------------------------------------------------|
-data_folder = 'Data'
-subfolder = 'qmidens' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-
-qmidens = open('Data/qmidens/qmidens_test.dat','w')
+fn.directory('qmidens')
+qmidens = open('Data/qmidens/qmidens.dat','w')
 qmidens.write('lattice qmiden\n----------\n f, n, a, nmc, neq, dx, n_alpha\n')
 qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(f, n, a, nmc, neq, dx, n_alpha))
 qmidens.write('fluctuations around instanton path\n ---------------------\n')
 
-idens_conf = open('Data/qmidens/idens_conf_test.dat', 'w')
+idens_conf = open('Data/qmidens/idens_conf.dat', 'w')
 idens_conf.write('tau, x[i]\n')
 
-vac_conf = open('Data/qmidens/vac_conf_test.dat','w')
+vac_conf = open('Data/qmidens/vac_conf.dat','w')
 vac_conf.write('tau, x[i]\n')
 #---------variable initialization----------------------------------------------|
 Sinst_tot = 0
@@ -105,6 +98,9 @@ Sinst_tot = fn.action(x_inst, n, a, f)
 Svac_tot = fn.action(x_vac, n, a, f)
 qmidens.write('f0\t Sinst_tot\t s0\n')
 qmidens.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f0, Sinst_tot, s0))
+for k in range(n):
+    idens_conf.write('{}\t{:.4f}\n'.format(k*a, x_inst[k]))
+    vac_conf.write('{}\t{:.4f}\n'.format(k*a, x_vac[k]))
 for ialpha in tqdm(range((2 * n_alpha + 1))):
     if ialpha <= n_alpha:
         alpha = ialpha * dalpha  #da 0 a 1

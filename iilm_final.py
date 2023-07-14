@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import random
 import functions as fn
-import os
+
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -12,7 +12,7 @@ def setting_inputs():
     neq = 100 #number of equilibration sweeps
     nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
+    n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
     tcore = 0.3
@@ -36,7 +36,8 @@ xnin2 = dens2*tmax        #NLO total tunneling events
 nexp  = int(xnin+0.5)
 nexp2 = int(xnin2+0.5)
 '''-------------outputs file---------------------------------------------------'''
-fn.directory('iilm')        
+fn.directory('iilm')
+        
 iilm = open('Data/iilm/iilm.dat', 'w')
 iilm.write('qm iilm\n n\t a\t f\n'+'{}\t{:.4f}\t{:.4f}\n'.format(n, a, f))
 iilm.write('N_inst\t nmc\t neq\t n_p\t nc\n'+'{}\t{}\t{}\t{}\t{}\n'.format(N_inst, nmc, neq, n_p, nc))
@@ -98,13 +99,11 @@ for na in range(ni, ni*2):
     T = fn.kinetic(x, n, a)
     V = fn.potential(x, n, a, f)
     S = T+V
-    shc   = fn.hardcore_interaction(z, 2, tcore, score, tmax, s0)
-    S += shc
+    S  += fn.hardcore_interaction(z, 2, tcore, score, tmax, s0)
     sia.write('{:.4f}\t{:.4f}\n'.format((na-ni)*a, S/s0-2.0))
 #   setup and intial action                                                
 #------------------------------------------------------------------------------
-for i in range(N_inst):
-    z[i] = random.random()*tmax
+z = np.random.uniform(0, tmax, size = N_inst)
 z = np.sort(z)
 x = fn.new_config(x, n, N_inst, z, f, a)
 
@@ -135,7 +134,7 @@ for i in tqdm(range(nmc)):
         x3cor2_sum = np.zeros(n_p)
         iz         = np.zeros(nzhist)
     z, x = fn.update_interacting_instanton(N_inst, z, tmax, tcore, score, dz, x, n, a, f, s0)
-    if i < 400:
+    if i > 100 and i < 3000 :
         for ipr in range(min(10,len(z))):
             iconf.write(f'{z[ipr]:.4f}\t')
         iconf.write('\n')
@@ -145,9 +144,8 @@ for i in tqdm(range(nmc)):
     T = fn.kinetic(x, n, a)
     V = fn.potential(x, n, a, f)
     S = T + V
-    sch = fn.hardcore_interaction(z, N_inst, tcore, score, tmax, s0)
-    S += sch
-    
+    S += fn.hardcore_interaction(z, N_inst, tcore, score, tmax, s0)
+       
     S_sum  += S
     S2_sum += S**2
     V_sum  += V

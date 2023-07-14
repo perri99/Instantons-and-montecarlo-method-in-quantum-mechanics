@@ -2,7 +2,6 @@ import numpy as np
 import random
 from tqdm import tqdm
 import functions as fn
-import os
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #     Random instanton calculation in quantum mechanics                     
@@ -44,7 +43,7 @@ def setting_inputs():
     neq = 100 #number of equilibration sweeps
     nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
+    n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
     nheat = 10
@@ -53,7 +52,7 @@ def setting_inputs():
 
 
 f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst,nheat, seed = setting_inputs()
-random.seed(seed)
+#random.seed(seed)
 #-------defining constants-------------------------------------------------------|
 pi    = np.pi
 tmax  = n*a
@@ -65,13 +64,7 @@ xnin2 = dens2*tmax
 nexp  = int(xnin+0.5)
 nexp2 = int(xnin2+0.5)
 #--------opening output files----------------------------------------------------|
-data_folder = 'Data'
-subfolder = 'rilmgauss' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+fn.directory('rilmgauss')
 
 rilmgauss = open('Data/rilmgauss/rilmgauss.dat','w')
 rilmgauss.write('gaussian\n f, n, a, N_inst, nmc, n_p, nc, dx, nheat\n')

@@ -79,8 +79,6 @@ xcor_er    = np.zeros(n_p)
 x2cor_er   = np.zeros(n_p)
 x3cor_er   = np.zeros(n_p)
 histo_x    = np.zeros(nxhist)
-#dx = np.zeros(n_p-1)
-#dxe = np.zeros(n_p-1)
 #starting configuration-----------------------------------------|
 x = fn.periodic_starting_conf( n, f, mode)
 #---------montecarlo generations--------------------------------|
@@ -156,7 +154,6 @@ for ip in range(n_p-1):
     correlations3.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ip*a, x3cor_av[ip], x3cor_er[ip], dx3[ip], dxe3[ip]))
 #----------wave function---------------------------------------------------------------|
 position, wave_function = fn.building_wavefunction(histo_x, nxhist, stxhist, xhist_min)
-#wave_function = fn.normalization(wave_function, position[1]-position[0])
 for i in range(nxhist):
     wavefunction.write("{:.4f}\t{:.4f}\n".format(position[i], wave_function[i]))
 #-----------closing files--------------------------------------------------------------|

@@ -167,8 +167,8 @@ plt.legend()
 plt.xlim(0, 1.5)
 plt.xlabel('time')
 plt.ylabel('<x^n(0)x^n(τ)>')
-plt.savefig('Data/qm/correlations.pdf')
-plt.savefig('Data/qm/correlations.png')
+plt.savefig('Data/qm/correlations_qm.pdf')
+plt.savefig('Data/qm/correlations_qm.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 4: Fig. b. Shows the logarithmic derivative of the correlators
@@ -232,12 +232,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 plt.legend()
 plt.ylim(0, 6)
-plt.xlim(0, 1)
+plt.xlim(0, 1.5)
 #plt.title('Logarithmic derivatives of correlation functions')
 plt.xlabel('time')
 plt.ylabel('dlog<x^n(0)x^n(τ)>')
-plt.savefig('Data/qm/dlog.pdf')
-plt.savefig('Data/qm/dlog.png')
+plt.savefig('Data/qm/dlog_qm.pdf')
+plt.savefig('Data/qm/dlog_qm.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 5: Free energy F = −T log(Z) of the anharmonic oscillator as a 
@@ -266,7 +266,7 @@ y     = np.array(column2)
 y_err  = np.array(column3)
 
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'simulated')
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'adiabatic switching')
 
 plt.xlabel('T')
 plt.ylabel('F')
@@ -274,6 +274,7 @@ plt.ylabel('F')
 plt.xscale('log')
 plt.xlim(0.01,2.5)
 plt.ylim(-4, 0)
+plt.legend()
 plt.savefig('Data/qmswitch/free_energy.pdf')
 plt.savefig('Data/qmswitch/free_energy.png')
 plt.show()
@@ -318,7 +319,7 @@ plt.plot(x, y, color = 'black')
 
 
 with open('Data/qmcool/correlations_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -331,7 +332,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'blue', markersize=8, capsize=5, label = '<x(0)x(τ)>')
 
 with open('Data/qmcool/correlations2_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -344,7 +345,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = '<x^2(0)x^2(τ)>')
 
 with open('Data/qmcool/correlations3_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[1]) for line in lines]
@@ -357,12 +358,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
 plt.legend()
 #plt.title('Cooled correlation functions')
-plt.xlim(0, 1)
+plt.xlim(0, 1.5)
 plt.ylim(0,8)
 plt.xlabel('time')
 plt.ylabel('<x^n(0)x^n(τ)>')
-plt.savefig('Data/qmcool/correlations.pdf')
-plt.savefig('Data/qmcool/correlations.png')
+plt.savefig('Data/qmcool/correlations_cool.pdf')
+plt.savefig('Data/qmcool/correlations_cool.png')
 plt.show()
 
 #------------------------------------------------------------------------------
@@ -388,7 +389,7 @@ y = np.array(column4)
 plt.plot(x, y, color = 'black')
 
 with open('Data/qmcool/correlations_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -401,7 +402,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'blue', markersize=8, capsize=5, label = 'dlog<x(0)x(τ)>')
 
 with open('Data/qmcool/correlations2_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -414,7 +415,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 
 with open('Data/qmcool/correlations3_cool.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -427,12 +428,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 plt.legend()
 plt.ylim(-0.2, 6)
-plt.xlim(0, 1)
+plt.xlim(0, 1.5)
 plt.title('Logarithmic derivatives of cooled correlation functions')
 plt.xlabel('time')
 plt.ylabel('dlog<x^n(0)x^n(τ)>')
-plt.savefig('Data/qmcool/dlog.pdf')
-plt.savefig('Data/qmcool/dlog.png')
+plt.savefig('Data/qmcool/dlog_cool.pdf')
+plt.savefig('Data/qmcool/dlog_cool.png')
 plt.show()
 
 #------------------------------------------------------------------------------
@@ -653,7 +654,7 @@ column2 = [float(line.split()[1]) for line in lines]
 x     = np.array(column1)
 y     = np.array(column2)
 
-plt.plot(x, y/2, color = 'black', linewidth = 0.8)
+plt.plot(x, y/2, color = 'black', linewidth = 0.8, label = '\u0394E/2')
 #----------------------------------------
 with open('Data/qmcool/instdensity_varf.dat') as file:
     lines = file.readlines()
@@ -691,10 +692,10 @@ for i in range(3):
     x     = np.array(column1)
     y     = np.array(column2)
     if i==0:
-        plt.plot(x, y, color = 'black', linewidth = 0.8)
+        plt.plot(x, y, color = 'black', linewidth = 2.5,label = 'instanton')
     else:
-        plt.plot(x, y, color = 'green', linewidth = 0.8, label = 'instanton fluctuations')
-for i in range(4):
+        plt.plot(x, y, color = 'green', linewidth = 0.8)
+for i in range(3):
     with open('Data/qmidens/vac_conf.dat', 'r') as file:
         lines = file.readlines()[i*n+1:(i+1)*n]
 
@@ -704,9 +705,9 @@ for i in range(4):
     x     = np.array(column1)
     y     = np.array(column2)
     if i==0:
-        plt.plot(x, y, color = 'black', linewidth = 0.8)
+        plt.plot(x, y, color = 'red', linewidth = 2.5, label = 'vacuum')
     else:
-        plt.plot(x, y, color = 'blue', linewidth = 0.8, label = 'vacuum fluctuations')
+        plt.plot(x, y, color = 'blue', linewidth = 0.8)
 plt.legend()
 plt.xlabel('τ')
 plt.ylabel('X')
@@ -793,12 +794,12 @@ y_err = np.array(column3)
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
 plt.legend()
-plt.title('Correlation functions rilm')
-plt.xlim(0, 1)
+#plt.title('Correlation functions rilm')
+plt.xlim(0, 1.5)
 plt.xlabel('time')
 plt.ylabel('<x^n(0)x^n(τ)>')
-plt.savefig('Data/rilm/correlations.pdf')
-plt.savefig('Data/rilm/correlations.png')
+plt.savefig('Data/rilm/correlations_rilm.pdf')
+plt.savefig('Data/rilm/correlations_rilm.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 10.b Shows the logarithmic derivative of the correlators
@@ -849,7 +850,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 
 with open('Data/rilm/correlations3_rilm.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -862,12 +863,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 plt.legend()
 plt.ylim(0, 6)
-plt.xlim(0, 1)
-plt.title('Logarithmic derivatives of correlation functions')
+plt.xlim(0, 1.5)
+#plt.title('Logarithmic derivatives of correlation functions')
 plt.xlabel('time')
 plt.ylabel('dlog<x^n(0)x^n(τ)>')
-plt.savefig('Data/rilm/dlog.pdf')
-plt.savefig('Data/rilm/dlog.png')
+plt.savefig('Data/rilm/dlog_rilm.pdf')
+plt.savefig('Data/rilm/dlog_rilm.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 12: Typical euclidean path obtained in a Monte Carlo simulation of the 
@@ -1005,12 +1006,12 @@ y_err = np.array(column3)
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
 plt.legend()
-plt.title('Correlation functions rilm')
-plt.xlim(0, 1)
+#plt.title('Correlation functions rilm')
+plt.xlim(0, 1.5)
 plt.xlabel('time')
 plt.ylabel('<x^n(0)x^n(τ)>')
-plt.savefig('Data/rilmgauss/correlations.pdf')
-plt.savefig('Data/rilmgauss/correlations.png')
+plt.savefig('Data/rilmgauss/correlations_rilmgauss.pdf')
+plt.savefig('Data/rilmgauss/correlations_rilmgauss.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   FIG. 13.b Shows the logarithmic derivative of the correlators
@@ -1061,7 +1062,7 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 
 with open('Data/rilmgauss/correlations3_rilmgauss.dat', 'r') as file:
-    lines = file.readlines()[2:20]
+    lines = file.readlines()[2:]
 
 column1 = [float(line.split()[0]) for line in lines]
 column2 = [float(line.split()[3]) for line in lines]
@@ -1074,12 +1075,12 @@ plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 plt.legend()
 plt.ylim(0, 6)
-plt.xlim(0, 1)
-plt.title('Logarithmic derivatives of correlation functions')
+plt.xlim(0, 1.5)
+#plt.title('Logarithmic derivatives of correlation functions')
 plt.xlabel('time')
 plt.ylabel('dlog<x^n(0)x^n(τ)>')
-plt.savefig('Data/rilmgauss/dlog.pdf')
-plt.savefig('Data/rilmgauss/dlog.png')
+plt.savefig('Data/rilmgauss/dlog_gauss.pdf')
+plt.savefig('Data/rilmgauss/dlog_gauss.png')
 plt.show()
 #------------------------------------------------------------------------------
 #   Fig.16 Distribution of instanton-anti-instanton separations
@@ -1114,4 +1115,183 @@ plt.ylim(0,40000)
 plt.legend()
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.pdf')
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.png')
+plt.show()
+#-----------------------------------------------------------------------------
+#   Fig.17 Typical instanton configuration in an instanton calculation
+#------------------------------------------------------------------------------
+with open('Data/iilm/iconf_iilm.dat', 'r') as file:
+    lines = file.readlines()[:3001]
+
+for i in range(10):
+    column  = [float(line.split()[i]) for line in lines]
+    
+    y = np.array(column)
+    x = range(len(y))
+    if i % 2 == 0:
+        plt.plot(x, y, color = 'blue', linewidth = 0.3)
+    else:
+        plt.plot(x, y, color = 'red', linewidth = 0.3)
+
+plt.xlabel('configurations')
+plt.ylabel('x')
+plt.title('Instanton configuration in an interacting instanton calculation')
+
+plt.xlim(0, 3000)
+plt.savefig('Data/iilm/inst_position.pdf')
+plt.savefig('Data/iilm/inst_position.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. new.a Shows the correlation functions in a random instanton ensamble
+#   with interactions
+#------------------------------------------------------------------------------
+''' Exact correlation functions vs montecarlo '''
+
+with open('Data/qmdiag/cor.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+with open('Data/qmdiag/cor2.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+with open('Data/qmdiag/cor3.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+
+with open('Data/iilm/icor_iilm.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '<x(0)x(τ)>')
+
+with open('Data/iilm/icor2_iilm.dat', 'r') as file:
+    lines = file.readlines()[1:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = '<x^2(0)x^2(τ)>')
+
+with open('Data/iilm/icor3_iilm.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = '<x^3(0)x^3(τ)>')
+plt.legend()
+#plt.title('Correlation functions rilm')
+plt.xlim(0, 1.5)
+plt.xlabel('time')
+plt.ylabel('<x^n(0)x^n(τ)>')
+plt.savefig('Data/iilm/correlations_iilm.pdf')
+plt.savefig('Data/iilm/correlations_iilm.png')
+plt.show()
+#------------------------------------------------------------------------------
+#   FIG. 13.b Shows the logarithmic derivative of the correlators
+#------------------------------------------------------------------------------
+''' Exact log derivatives vs Montecarlo simulation'''
+with open('Data/qmdiag/dlog.dat', 'r') as file:
+    lines = file.readlines()
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[1]) for line in lines]
+column3 = [float(line.split()[2]) for line in lines]
+column4 = [float(line.split()[3]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column3)
+plt.plot(x, y, color = 'black')
+
+y = np.array(column4)
+plt.plot(x, y, color = 'black')
+
+with open('Data/iilm/icor_iilm.dat', 'r') as file:
+    lines = file.readlines()[3:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'dlog<x(0)x(τ)>')
+
+with open('Data/iilm/icor2_iilm.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'red', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+
+with open('Data/iilm/icor3_iilm.dat', 'r') as file:
+    lines = file.readlines()[2:]
+
+column1 = [float(line.split()[0]) for line in lines]
+column2 = [float(line.split()[3]) for line in lines]
+column3 = [float(line.split()[4]) for line in lines]
+
+x = np.array(column1)
+y = np.array(column2)
+y_err = np.array(column3)
+plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
+             markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
+plt.legend()
+plt.ylim(-0.2, 0, 6)
+plt.xlim(0, 1.5)
+#plt.title('Logarithmic derivatives of correlation functions')
+plt.xlabel('time')
+plt.ylabel('dlog<x^n(0)x^n(τ)>')
+plt.savefig('Data/iilm/dlog_iilm.pdf')
+plt.savefig('Data/iilm/dlog_iilm.png')
 plt.show()

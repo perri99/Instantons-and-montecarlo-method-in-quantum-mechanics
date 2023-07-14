@@ -2,7 +2,6 @@ import numpy as np
 import random
 from tqdm import tqdm
 import functions as fn
-import os
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #     Random instanton calculation in quantum mechanics                     
@@ -43,7 +42,7 @@ def setting_inputs():
     neq = 100 #number of equilibration sweeps
     nmc = 10**5 #number of MonteCarlo sweeps
     dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
+    n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
     # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
@@ -51,7 +50,7 @@ def setting_inputs():
     return f, n, a, N_inst, neq, nmc, dx, n_p, nc, kp, seed
 '''Setting inputs'''
 f, n, a, N_inst, neq, nmc, dx, n_p, nc, kp, seed = setting_inputs()
-random.seed(seed)
+#random.seed(seed)
 '''constant definitions'''
 pi    = np.pi
 tmax  = n*a
@@ -108,13 +107,7 @@ x2cor2_sum = np.zeros(n_p)
 x3cor_sum  = np.zeros(n_p)
 x3cor2_sum = np.zeros(n_p)
 '''-------opening output files---------------------'''
-data_folder = 'Data'
-subfolder = 'rilm' 
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
-folder_path = os.path.join(data_folder, subfolder)
-if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+fn.directory('rilm')
 
 config1 = open('Data/rilm/trajectory_rilm.dat', 'w')
 config1.write('configuration, S_tot, T_tot, V_tot\n')
@@ -142,8 +135,8 @@ histz.write('t z[i]\n')
 #------------------------------------------------------------------------------
 for i in tqdm(range(nmc)):
     nconf += 1
-    for i in range(N_inst):
-        z[i] = random.random()*tmax
+    for j in range(N_inst):
+        z[j] = random.random()*tmax
     z = np.sort(z)
     x = fn.new_config(x, n, N_inst, z, f, a)
     #   distribution of instantons                                             
@@ -161,8 +154,8 @@ for i in tqdm(range(nmc)):
     #output configurations
     if i % kp == 0:
         config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S_tot, ttot, vtot))
-        for i in range(n):
-           config2.write("{:.4f}\t{:.4f}\n".format(i*a, x[i]))
+        for k in range(n):
+           config2.write("{:.4f}\t{:.4f}\n".format(k*a, x[k]))
         config2.write("------------------\n\n")
     
     #Histogram creation
