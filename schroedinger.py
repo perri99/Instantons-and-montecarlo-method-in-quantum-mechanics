@@ -1,27 +1,42 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import trapezoid
 import math
-from tqdm import tqdm
 import numba as nb
+'''
+Schroedinger resolver. It is imported as module in qmdiag.py
+'''
+
+def initialize_param():
+    x_min = -4.0
+    x_max = 4.0
+    minimum = 1.4
+    mass = 0.5
+    point_num = 1000
+    return x_min, x_max, minimum, mass, point_num
+
 
 @nb.jit(nopython = True)
-def anharmonic_potential(x):
-    minimum, mass = initialize_potential()
+def anharmonic_potential(x, mass, minimum):
+    '''
+    double well potential
+
+    Parameters
+    ----------
+    x : float, array(float)
+        position.
+    mass : float
+        particle mass.
+    minimum : float
+        position of minimum potential.
+
+    Returns
+    -------
+    float, array(float)
+        potential value in x.
+
+    '''
     return 2*mass*(x**2-minimum**2)**2
 
-@nb.jit(nopython = True)
-def initialize_potential():
-	minimum = 1.4
-	mass = 0.5 # a.u.
-	return minimum, mass
-
-@nb.jit(nopython = True)
-def initialize_param():
-	x_min = -4
-	x_max = +4  #integration range
-	point_num = 1000   #lattice discretization
-	return x_min, x_max, point_num
 
 @nb.jit(nopython = True)
 def normalization(x,dx):
@@ -90,6 +105,31 @@ def solve_schroedinger(mass, x, V, Step,point_num):
 
 @nb.jit(nopython = True)
 def correlation_function(E, e, x, dx, d, tau):
+    '''
+    Computation of correlation function <x(0)^d x(tau)^d>
+
+    Parameters
+    ----------
+    E : array(float, float)
+        Matrix containing energy eigenvectors \
+            in position space E[j,n] = <x_j|n>.
+    e : array(float)
+        Energy eigenvalues of the system (sorted).
+    x : array(float)
+        discretized space.
+    dx : float
+        spce discretization.
+    d : int
+        order of the correlation function.
+    tau : float
+        time of evaluation.
+
+    Returns
+    -------
+    G : float
+        correlation function of order d at time tau.
+
+    '''
     G = 0
     for n in range(40):
         c = 0
@@ -98,17 +138,39 @@ def correlation_function(E, e, x, dx, d, tau):
         G += c**2 * math.exp(-(e[n]-e[0]) * tau)
     return G
 
+@nb.jit(nopython = True)
 def log_derivative(x,n, dt):
+    '''
+    log derivative evaluation
+
+    Parameters
+    ----------
+    x : array
+        array of wich we compute log derivative.
+    n : int
+        number of point in time direction.
+    dt : float
+        time variation
+
+    Returns
+    -------
+    dx : array
+        log derivative of x.
+
+    '''
     dx = np.zeros(n)
     for j in range(n):
         dx[j]  = (x[j]-x[j+1]) / (x[j]*dt) #log derivative
     return dx
 
 if __name__ == '__main__':
-    minimum, mass = initialize_potential()
-    x_min, x_max, point_num = initialize_param()
+    x_min, x_max, minimum, mass, point_num = initialize_param()
     Step = (x_max-x_min)/(point_num - 1)
     x = np.linspace(x_min, x_max, point_num)  #creation of a lattice 1d space
-    V = anharmonic_potential(x)
+    V = anharmonic_potential(x, mass, minimum)
     EigValues, EigVectors = solve_schroedinger(mass, x, V, Step, point_num)
-       
+    plt.plot(x,V)
+    plt.ylim(0, 10)
+    for j in range(4):
+        plt.plot(x, EigVectors[:,j]**2 + EigValues[j])
+    plt.show()   
