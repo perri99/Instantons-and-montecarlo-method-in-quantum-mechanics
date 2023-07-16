@@ -2,7 +2,15 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
+'''
+Computation of the free energy of the anharmonic oscillator by means\
+    of adiabatic switching: S = S0 + alpha(S-S0)
+    Reference system is harmonic oscillator
+This program only evaluate the value of the free energy for a fixed\
+    temperature (euclidean time). For a complete evaluation see\
+        qmswitch_loop.py
+Details of adiabatic switching procedure are saved in the output file
+'''
 def setting_inputs():
     f = 1.4 #minimum of the potential
     n = 800 #lattice points
@@ -18,30 +26,25 @@ def setting_inputs():
     w0 = 5.6
     return f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
 
-#setting inputs
+#------------------------setting inputs-----------------------------------
 f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
 random.seed(seed)
-
-#output files
+#------------------------output files------------------------------------
 fn.directory('qmswitch')
         
 switch = open('Data/qmswitch/switch.dat','w')
 switch.write('montecarlo switch\n ----- \n')
 switch.write('f\t n\t a\t nmc\t neq\t dx\t mode\t w0\t n_alpha\n')
 switch.write("{:.2f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n\n".format(f,n,a, nmc, neq, dx, mode, w0, n_alpha))
-
-#counters
+#--------------------------counter----------------------------------
 nconf = 0
-ncor  = 0
-
-
-#definitions
+#------------------------definitions--------------------------------
 dalpha = 1.0/float(n_alpha)
 beta   = n*a
 e0     = w0/2.0   #energy of ground state of harmonic oscillator
 f0     = 1.0/beta*np.log(2.0*np.sinh(e0*beta)) #harmonic oscillator free energy
 ei     = e0      
-#-------variable definitions----------------------------------------|
+#-------------------variable definitions----------------------------------------|
 S_sum = 0.0
 S2_sum = 0.0
 T_sum = 0.0

@@ -2,6 +2,7 @@ import numpy as np
 import os
 import random
 import numba as nb
+from tqdm import tqdm
 #------------------------------------------------------------------------------|
 '''
 Functions needed in qm.py, qmswitch.py, qmcool.py, qmidens.py
@@ -35,11 +36,13 @@ def directory(name):
 @nb.jit(nopython = True)
 def normalization(x,dx):
     '''
-    returns an array normalized to 1
+    returns the array x normalized to 1 w.r.t. euclidean metric \n
     Parameters:
+    ------------------------
         x: array-like
-        dx: floating type
-    Return:     
+        dx: floating type \n
+    Return:  
+    ------------------------
         x/norm: array-like
     '''
     norm = np.sqrt(np.sum(x**2 * dx))
@@ -49,27 +52,28 @@ def normalization(x,dx):
 @nb.jit(nopython = True)
 def new_config(x,n,N_inst, z, f, a):
     '''
-    
+    Initialize a configuration via sum ansatz path \
+        with a number of instanton N_inst
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    n : TYPE
-        DESCRIPTION.
-    N_inst : TYPE
-        DESCRIPTION.
-    z : TYPE
-        DESCRIPTION.
-    f : TYPE
-        DESCRIPTION.
-    a : TYPE
-        DESCRIPTION.
+    x : array(float)
+        configuration array.
+    n : int
+        lattice points.
+    N_inst : int(even)
+        total number of tunneling events(instantons+antiinstantons).
+    z : array(float)
+        instanton time location array.
+    f : float
+        double well separation.
+    a : float
+        lattice discretization.
 
     Returns
     -------
-    x : TYPE
-        DESCRIPTION.
+    x : array (float)
+        sum ansatz path configuration.
 
     '''
     for j in range(1,n):
@@ -83,23 +87,24 @@ def new_config(x,n,N_inst, z, f, a):
 @nb.jit(nopython = True)
 def sum_ansatz_path(N_inst, z, f,t):
     '''
-    
+    Evaluation of sum ansatz configuration at time t \
+        for the instantons located as in z
 
     Parameters
     ----------
-    N_inst : TYPE
-        DESCRIPTION.
-    z : TYPE
-        DESCRIPTION.
-    f : TYPE
-        DESCRIPTION.
-    t : TYPE
-        DESCRIPTION.
+    N_inst : int
+        instantons number.
+    z : array(float)
+        time location of instantons.
+    f : float
+        position of minimum of double well.
+    t : float
+        time at wich the sum ansatz is evaluated.
 
     Returns
     -------
-    xsum : TYPE
-        DESCRIPTION.
+    xsum : float
+        sum ansatz at time t.
 
     '''
     neven = N_inst - (N_inst % 2)
@@ -276,25 +281,26 @@ def periodic_starting_conf(n, f,mode):
 @nb.jit(nopython = True)
 def periodic_update(x,n,a,f,dx):
     '''
-    
+    Metropolis algorithm implementation for configuration\
+        with periodic boundary conditions.
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    n : TYPE
-        DESCRIPTION.
-    a : TYPE
-        DESCRIPTION.
-    f : TYPE
-        DESCRIPTION.
-    dx : TYPE
-        DESCRIPTION.
+    x : araay(float)
+        starting configuration.
+    n : int
+        lattice points.
+    a : float
+        lattice spacing.
+    f : float
+        location of double well minimum.
+    dx : float
+        update gaussian width.
 
     Returns
     -------
-    x : TYPE
-        DESCRIPTION.
+    x : array (float)
+        updated configuration.
 
     '''
     for j in range(1,n):
@@ -373,6 +379,33 @@ def initialize_vacuum(n,f):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def compute_energy(x,n, a ,f):
+    '''
+    return action, potential energy , kinetic energy\
+        virial term of configuration x
+
+    Parameters
+    ----------
+    x : araay(float)
+        configuration.
+    n : int
+        lattice points.
+    a : float
+        lattice spacing.
+    f : float
+        location of double well minimum.
+
+    Returns
+    -------
+    S : float
+        action.
+    V : float
+        potential energy.
+    T : float
+        kinetic term.
+    tvtot : float
+        virial term.
+
+    '''
     V = potential(x,n, a, f)
     T = kinetic(x,n, a)
     S = V + T
@@ -385,6 +418,35 @@ def compute_energy(x,n, a ,f):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def compute_energy_switch(x,n, a ,f, w0, alpha):
+    '''
+    evaluation of action and energies in adiabatic switching\
+        S = S0 + alpha(S-S0)
+
+    Parameters
+    ----------
+    x : TYPE
+        DESCRIPTION.
+    n : TYPE
+        DESCRIPTION.
+    a : TYPE
+        DESCRIPTION.
+    f : TYPE
+        DESCRIPTION.
+    w0 : TYPE
+        DESCRIPTION.
+    alpha : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    S : TYPE
+        DESCRIPTION.
+    V : TYPE
+        DESCRIPTION.
+    P : TYPE
+        DESCRIPTION.
+
+    '''
     V = potential_switch(x, n, a, f, w0, alpha)
     T = kinetic(x,n, a)
     S = V + T
@@ -550,7 +612,7 @@ def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
         znew   = zold + (random.random()-0.5)*dz
         if znew > tmax:
             znew -= tmax
-        if znew < -tmax:
+        if znew < 0:
             znew += tmax
         z[iin] = znew
         z      = np.sort(z)
@@ -590,6 +652,26 @@ def update_vacuum(x,x0,w,vi,n,a,f,alpha,dx):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def dispersion(n, xtot, x2tot):
+    '''
+    computes mean and error
+
+    Parameters
+    ----------
+    n : int
+        number of samples.
+    xtot : float
+        total sum of n elements.
+    x2tot : float
+        total sum of n elements squared .
+
+    Returns
+    -------
+    x_average : float
+        mean over n.
+    xerr : float
+        standard deviation.
+
+    '''
     if n < 1:
         raise ValueError("Number of measurements must be at least 1")
     x_average = xtot / float(n)
@@ -602,6 +684,25 @@ def dispersion(n, xtot, x2tot):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def correlations_functions(x,n,n_p):
+    '''
+    compute x(tau0)x(tau0+dtau) for random tau0 and different\
+        evaluation points
+
+    Parameters
+    ----------
+    x : array(float)
+        configuration.
+    n : int
+        lattice points in euclidean time direction.
+    n_p : int
+        number of evaluation point.
+
+    Returns
+    -------
+    xcor : array(float)
+        xcor[j] = <x[tau0]x[tau0+j]>.
+
+    '''
     xcor = np.zeros(n_p)
     ip0  = int((n-n_p)*random.random()) #prendo 5 punti di partenza a caso tra x[o] e x[779]
     x0   = x[ip0] 
@@ -633,10 +734,30 @@ def cool_correlations_functions(x, ip0, n, n_p):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def log_derivatives(x,err,a,n_p):
-    dx = np.zeros(n_p-1)
-    dxe = np.zeros(n_p-1)
-    for ip in range(n_p-1):
+def log_derivatives(x,err,a):
+    '''
+    computes log derivative of x w.r.t. euclidean time
+
+    Parameters
+    ----------
+    x : array
+        array of wich we want to take log derivative.
+    err : array
+        error associated to x.
+    a : float
+        lattice spacing in euclidean time direction.
+
+    Returns
+    -------
+    dx : array
+        log derivative of x.
+    dxe : array
+        error associated to the log derivative.
+
+    '''
+    dx = np.zeros(x.size-1)
+    dxe = np.zeros(x.size-1)
+    for ip in range(x.size-1):
         dx[ip]  = (x[ip]-x[ip+1])/x[ip]/a #log derivative
         dxe2 = (err[ip+1]/x[ip])**2
         + (err[ip]*x[ip+1]/x[ip]**2)**2 #error propagation squared
@@ -645,31 +766,60 @@ def log_derivatives(x,err,a,n_p):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def substract(x,err,n_p):
+def substract(x,err):
+    '''
+    substraction of constant terms in x^2 correlation function
+
+    Parameters
+    ----------
+    x : array(float)
+        
+    err : array(float)
+        
+
+    Returns
+    -------
+    x_sub : array
+        array x substracted.
+    err_sub : array
+        array err substracted.
+
+    '''
     x_sub = np.copy(x)
     err_sub = np.copy(err)
-    xs = x[n_p-1]
-    errs  = err[n_p-1]
-    for ip in range(n_p):
+    xs = x[x.size-1]
+    errs  = err[x.size-1]
+    for ip in range(x.size):
         x_sub[ip] = x[ip]-xs 
         err_sub[ip] = np.sqrt(err[ip]**2+errs**2)
     return x_sub, err_sub       
+
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def histogramarray(x,n, xmin, st, m, hist):
-    for k in range(n):
-        j = (x[k] - xmin)/st + 1.000001
-        if (j < 1):
-            j = 1
-        if (j > m):
-            j = m
-        hist[int(j)-1] += 1
-#---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
-@nb.jit(nopython = True)
-def histogramarray2(x, xmin, st, m, hist):
-    j = (x - xmin)/st + 1.000001
+def histogramarray(x, xmin, st, m, hist):
+    '''
+    evaluate in which bin of hist x must be counted
+
+    Parameters
+    ----------
+    x : float/int
+        value to be counted.
+    xmin : float
+        hist minimum.
+    st : float
+        bin width.
+    m : int
+        bins number.
+    hist : array
+        histograms to be filled.
+
+    Returns
+    -------
+    None.
+
+    '''
+    j = (x - xmin)/st + 1.00000
     if (j < 1):
         j = 1
     if (j > m):
@@ -681,17 +831,40 @@ def histogramarray2(x, xmin, st, m, hist):
 def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
     for ii in range(0, nin, 2):
         if ii == 0:
-            zm = z[nin] - tmax
+            zm =  -tmax
         else:
             zm = z[ii-1]
         z0  = z[ii]
         zp  = z[ii+1]
         zia = min(zp-z0, z0-zm)    #chiedere info
-        histogramarray2( zia, 0.0, stzhist, nzhist, iz)
+        histogramarray( zia, 0.0, stzhist, nzhist, iz)
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def building_wavefunction(hist, nxhist, stxhist, xhist_min):
+    '''
+    construction of the wave function probability density\
+        from the histogram of position occurrences
+
+    Parameters
+    ----------
+    hist : array
+        array in which occurences are stored.
+    nxhist : int
+        number of hist bin.
+    stxhist : float
+        bin width.
+    xhist_min : float
+        minimum of hist.
+
+    Returns
+    -------
+    position : array(float)
+        discretized x axis.
+    wave_function : array(float)
+        probability density of ground state wave function.
+
+    '''
     wave_function = np.zeros(nxhist)
     position = np.zeros(nxhist)
     xnorm = 0
@@ -840,3 +1013,327 @@ def find_instantons(x, dt):
 
     return pos_roots, neg_roots, \
            a, b
+#--------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
+#@nb.jit(nopython = True)
+def streamline_equation(n_lattice_half, r_initial_sep,\
+                        n_streamline, dtau, \
+                            tau_store = 1.5, stream_time_step = 0.001,\
+                                f = 1.4, a = 0.05):
+    stream = open('Data/streamline/streamline.dat', 'w')
+    conf = open('Data/streamline/conf.dat', 'w')
+    action0 = open('Data/streamline/action.dat', 'w')
+    conf1 = open('Data/streamline/conf1.dat', 'w')
+    conf2 = open('Data/streamline/conf2.dat', 'w')
+    conf3 = open('Data/streamline/conf3.dat', 'w')
+    conf4 = open('Data/streamline/conf4.dat', 'w')
+    conf5 = open('Data/streamline/conf5.dat', 'w')
+    conf6 = open('Data/streamline/conf6.dat', 'w')
+    conf7 = open('Data/streamline/conf7.dat', 'w')
+    conf8 = open('Data/streamline/conf8.dat', 'w')
+    conf9 = open('Data/streamline/conf9.dat', 'w')
+    conf10 = open('Data/streamline/conf10.dat', 'w')
+    action1 = open('Data/streamline/action1.dat', 'w')
+    action2 = open('Data/streamline/action2.dat', 'w')
+    action3 = open('Data/streamline/action3.dat', 'w')
+    action4 = open('Data/streamline/action4.dat', 'w')
+    action5 = open('Data/streamline/action5.dat', 'w')
+    action6 = open('Data/streamline/action6.dat', 'w')
+    action7 = open('Data/streamline/action7.dat', 'w')
+    action8 = open('Data/streamline/action8.dat', 'w')
+    action9 = open('Data/streamline/action9.dat', 'w')
+    action10 = open('Data/streamline/action10.dat', 'w')
+    s0 = 4/3 * f**3
+    tau_centers_ia = np.array([n_lattice_half * dtau - r_initial_sep / 2.0,
+                               n_lattice_half * dtau + r_initial_sep / 2.0])
+
+    tau_array = np.linspace(0.0, n_lattice_half * 2 *
+                            dtau, n_lattice_half * 2, False)
+    xconf = np.zeros(n_lattice_half*2)
+    xconf = new_config(xconf, n_lattice_half*2, len(tau_centers_ia), tau_centers_ia, f, a)
+    for k in range(len(tau_array)):
+        conf.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k]))
+
+    action_density = np.zeros(2 * n_lattice_half, float)
+    # Derivative in streamline parameter
+    lambda_derivative = np.zeros(2 * n_lattice_half)
+    xconf = np.append(xconf, xconf[1])
+    xconf = np.insert(xconf, 0, xconf[0])
+    xconf = np.insert(xconf, 0, xconf[0])
+    xconf[-1] = xconf[-2]
+    xconf = np.append(xconf, xconf[-1])
+    # Streamline evolution
+    for i_s in tqdm(range(n_streamline)):
+        # Evaluate the derivative of the action
+        for i_pos in range(2, 2 * n_lattice_half+2, 1):
+            der_2 = (-xconf[i_pos + 2] + 16 * xconf[i_pos + 1] - 30 *
+                     xconf[i_pos]
+                     + 16 * xconf[i_pos - 1] - xconf[i_pos - 2]) \
+                    / (12 * dtau * dtau)
+
+            lambda_derivative[i_pos - 2] = - der_2 / 2.0 + 4 * xconf[i_pos] \
+                                           * (xconf[i_pos]
+                                              * xconf[i_pos]
+                                              - f
+                                              * f)
+
+        for i_pos in range(2, 2 * n_lattice_half +2):
+            xconf[i_pos] += -lambda_derivative[i_pos - 2] * stream_time_step
+            
+        xconf[0] = xconf[2]
+        xconf[1] = xconf[2]
+        xconf[-1] = xconf[-3]
+        xconf[-2] = xconf[-3]
+        for i in range(2, 2 * n_lattice_half+2):
+            v = (xconf[i] ** 2 - f ** 2) ** 2
+            k = (xconf[i + 1] - xconf[i - 1]) / (2. * dtau)
+            action_density[i - 2] = k ** 2 / 4. + v
+            action0.write('{:.4f}\t{:.4f}\n'.format(tau_array[i-2], action_density[i-2]))
+        
+        s = action(xconf,n_lattice_half*2,dtau,f)
+        n_i, n_a, pos_root, neg_root = find_instantons(xconf[2:-2], dtau)
+        
+        if 59000 < i_s < 64000 and i_s % 10 == 0:
+            if n_i == n_a \
+                    and n_i != 0 \
+                    and pos_root.size == n_i and neg_root.size == n_a:
+                interactive_action = s - 2 * s0
+
+                tau_i_a = np.abs(pos_root[0] - neg_root[0])
+                if tau_i_a < tau_store - 0.08:
+                    stream.write('{:.4f}\t{:.4f}\n'.format(tau_i_a, interactive_action/s0))
+        
+        if s > 0.0001:
+            if s /s0 > 1.8:
+                print(1.8)
+                for k in range(len(tau_array)):
+                    conf1.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action1.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 1.6 :
+                print(1.6)
+                for k in range(len(tau_array)):
+                    conf2.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action2.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 1.4 :
+                print(1.4)
+                for k in range(len(tau_array)):
+                    conf3.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action3.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 1.2 :
+                print(1.2)
+                for k in range(len(tau_array)):
+                    conf4.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action4.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 1.0 :
+                print(1.0)
+                for k in range(len(tau_array)):
+                    conf5.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action5.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 0.8 :
+                print(0.8)
+                for k in range(len(tau_array)):
+                    conf6.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action6.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 0.6 :
+                print(0.6)
+                for k in range(len(tau_array)):
+                    conf7.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action7.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 0.4 :
+                print(0.4)
+                for k in range(len(tau_array)):
+                    conf8.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2])) 
+                    action8.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            elif s /s0 > 0.2 :
+                print(0.2)
+                for k in range(len(tau_array)):
+                    conf9.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action9.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+            else:
+                print(0.1)
+                for k in range(len(tau_array)):
+                    conf10.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
+                    action10.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
+    conf.close()
+    conf1.close()
+    conf2.close()
+    conf3.close()
+    conf4.close()
+    conf5.close()
+    conf6.close()
+    conf7.close()
+    conf8.close()
+    conf9.close()
+    conf10.close()
+    action0.close()
+    stream.close()
+    action1.close()
+    action2.close()
+    action3.close()
+    action4.close() 
+    action5.close() 
+    action6.close() 
+    action7.close() 
+    action8.close() 
+    action9.close() 
+    action10.close() 
+    return None
+#----------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
+#@nb.jit(nopython = True)
+def zero_crossing(x, n=800, f=1.4, a = 0.05):
+    ni = n//4
+    s0 = 4/3 * f** 3
+    tau_ia_zcr = np.array([], float)
+    action_int_zcr =np.array([], float)
+    for n_counter in range(ni, 2 * ni):
+        z = np.array([ni*a, n_counter*a])
+        x = new_config(x,n,2,z,f,a)
+        n_inst, n_a_inst, pos_roots, neg_roots = find_instantons(x,a)
+        if n_counter % 2 == 0 \
+                and n_inst == n_a_inst \
+                and n_inst > 0 \
+                and n_inst == len(pos_roots) \
+                and n_a_inst == len(neg_roots):
+
+            
+            for i in range(n_inst):
+                if i == 0:
+                    zero_m = neg_roots[-1] - n * a
+                else:
+                    zero_m = neg_roots[i - 1]
+
+                z_ia = np.minimum(np.abs(neg_roots[i] - pos_roots[i]),
+                                  np.abs(pos_roots[i] - zero_m))
+
+            
+                tau_ia_zcr = np.append(tau_ia_zcr, z_ia)
+                action_int_zcr = np.append(action_int_zcr, action(x,n,a,f))
+    action_int_zcr /= s0
+    action_int_zcr -= 2
+    return tau_ia_zcr, action_int_zcr
+#--------------------------------------------------------
+#--------------------------------------------------------
+#@nb.jit(nopython = True)
+def cool_zero_crossing(nmc, ncool, n = 800, dtau = 0.05, f = 1.4, mode = 0,\
+                       dx = 0.05, kp2 = 50):
+    s0 = 4/3 * f**3
+    tau_ia_zcr = np.array([], float)
+    action_int_zcr =np.array([], float)
+    n_inst_array = np.array([], float)
+    counter = 0
+    S_sum = 0
+    N_sum = 0
+    
+    x = periodic_starting_conf(n, f, mode)
+    for i in tqdm(range(nmc)):
+        x = periodic_update(x,n,dtau,f, dx)  #metropolis algorithm implementation with periodic boundary conditions
+        xs = np.copy(x)
+    #cooling sweeps
+        if i % kp2 == 0:
+            for icool in range(ncool):
+                xs = cooling_update(xs, n, dtau, f, dx)
+            n_instantons, n_anti_instantons,\
+                pos_roots, neg_roots = find_instantons(xs,dtau)
+            s = action(xs, n, dtau, f)
+            n_inst = n_instantons + n_anti_instantons
+        # total zero crossings
+            if n_instantons == n_anti_instantons \
+                and n_instantons == 1 \
+                and n_instantons == len(pos_roots) \
+                and n_anti_instantons == len(neg_roots):
+
+                    if pos_roots[0] < neg_roots[0]:
+                        for i in range(n_instantons):
+                            if i == 0:
+                                zero_m = neg_roots[-1] - n * dtau
+                            else:
+                                zero_m = neg_roots[i - 1]
+
+                            z_ia = np.minimum(np.abs(neg_roots[i] - pos_roots[i]),
+                                      np.abs(pos_roots[i] - zero_m))
+                            tau_ia_zcr = np.append(tau_ia_zcr, z_ia)
+                            action_int_zcr = np.append(action_int_zcr, s)
+                            n_inst_array = np.append(n_inst_array, n_inst)
+                        
+                            S_sum += s
+                            N_sum += n_inst
+                            counter += 1
+                        
+                    elif pos_roots[0] > neg_roots[0]:
+                        for i in range(n_instantons):
+                            if i == 0:
+                                zero_p = pos_roots[-1] - n * dtau
+                            else:
+                                zero_p = pos_roots[i - 1]
+
+                            z_ia = np.minimum(np.abs(pos_roots[i] - neg_roots[i]),
+                                      np.abs(neg_roots[i] - zero_p))
+                            tau_ia_zcr = np.append(tau_ia_zcr, z_ia)
+                            action_int_zcr = np.append(action_int_zcr, s)
+                            n_inst_array = np.append(n_inst_array, n_inst)
+                        
+                            S_sum += s
+                            N_sum += n_inst
+                            counter += 1
+                    else:
+                        continue
+    permute = tau_ia_zcr.argsort()
+    tau_ia_zcr = tau_ia_zcr[permute]
+    n_inst_array = n_inst_array[permute]
+    action_int_zcr = action_int_zcr[permute]
+    action_int_zcr /= (s0*n_inst_array)
+    action_int_zcr -= 2
+    print('Action: '+'{:.4f}\n'.format(S_sum/counter)+ 'Instantons: '+'{:.4f}'.format(N_sum/counter))
+    return tau_ia_zcr, action_int_zcr, n_inst_array
+    
+
+def cool_zero_crossing1(nmc, ncool, n = 800, dtau = 0.05, f = 1.4, mode = 0,\
+                       dx = 0.05, kp2 = 50):
+    s0 = 4/3 * f**3
+    tau_ia_zcr = np.array([], float)
+    action_int_zcr =np.array([], float)
+    n_inst_array = np.array([], float)
+    counter = 0
+    S_sum = 0
+    N_sum = 0
+    
+    xi= np.zeros(n)
+    xa= np.zeros(n)
+    z = np.zeros(n)
+    x = periodic_starting_conf(n, f, mode)
+    for i in tqdm(range(nmc)):
+        x = periodic_update(x,n,dtau,f, dx)  #metropolis algorithm implementation with periodic boundary conditions
+        xs = np.copy(x)
+    #cooling sweeps
+        if i % kp2 == 0:
+            for icool in range(ncool):
+                xs = cooling_update(xs, n, dtau, f, dx)
+            n_instantons, n_anti_instantons = instantons(f, dtau, n, xs, xi, xa, z)
+            s = action(xs, n, dtau, f)
+            n_inst = n_instantons + n_anti_instantons
+            if n_inst == 2:
+                for ii in range(0, n_inst, 2):
+                    if ii == 0:
+                        zm =  -n * dtau
+                    else:
+                        zm = z[ii-1]
+                    z0  = z[ii]
+                    zp  = z[ii+1]
+                    zia = min(zp-z0, z0-zm)
+                    tau_ia_zcr = np.append(tau_ia_zcr, zia)
+                    action_int_zcr = np.append(action_int_zcr, s)
+                    n_inst_array = np.append(n_inst_array, n_inst)
+                    counter +=1
+                    S_sum += s
+                    N_sum += n_inst
+    snc = action(x,n, dtau,f)
+    permute = tau_ia_zcr.argsort()
+    tau_ia_zcr = tau_ia_zcr[permute]
+    n_inst_array = n_inst_array[permute]
+    action_int_zcr = action_int_zcr[permute]
+    action_int_zcr /= s0
+    action_int_zcr -= 2
+    print(snc)
+    print('Action: '+'{:.4f}\n'.format(S_sum/counter)+ 'Instantons: '+'{:.4f}'.format(N_sum/counter))
+    return tau_ia_zcr, action_int_zcr, n_inst_array

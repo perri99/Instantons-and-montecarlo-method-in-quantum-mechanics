@@ -2,7 +2,14 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
+'''
+Montecarlo simulation of one non relativistic particle\
+    in a double well potential.
+This programme computes:
+    1. ground state wavefunction (squared)
+    2. correlation functions and their log derivatives
+    3. average quantities (action, position, energies....)
+'''
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -14,7 +21,7 @@ def setting_inputs():
     n_p = 35 #number max of points in the correlation functions
     nc = 5 #number of correlator measurements in a configuration
     kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
+    mode = 0 # mode=0: cold start, x_i=-f; mode != 0: hot start, x_i=random
     seed = 597
     return f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed
 
@@ -110,7 +117,8 @@ for i in tqdm(range(nmc)):
         x2_sum += np.sum(x**2)
         x4_sum += np.sum(x**4)
         x8_sum += np.sum(x**8)
-    fn.histogramarray(x, n,  xhist_min, stxhist, nxhist, histo_x)
+    for k in range(n):
+        fn.histogramarray(x[k], xhist_min, stxhist, nxhist, histo_x)
     #output configuration
     if i % kp == 0:
         config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S, T, V))
@@ -143,10 +151,10 @@ averages.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format
 averages.write('e_av, e_err, x_av, x_err, x2_av,x2_err, x4_av, x4_err\n')  
 averages.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(e_av, e_err, x_av, x_err, x2_av, x2_err, x4_av, x4_err))
 #----------log derivatives------------------------------------------------------------|
-dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a, n_p)
-x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er, n_p) #substracting: in the correlators there are constant terms to be substracted in the log computations
-dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a, n_p)
-dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a, n_p)
+dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a)
+x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er) #substracting: in the correlators there are constant terms to be substracted in the log computations
+dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a)
+dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a)
 #output log derivatives
 for ip in range(n_p-1):
     correlations.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(ip*a, xcor_av[ip], xcor_er[ip], dx[ip], dxe[ip]))
