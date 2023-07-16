@@ -5,7 +5,7 @@ from functions import directory
 from tqdm import tqdm
 '''
 This programme computes the spectrum of the double well potential\
-    in function of different values of double well separation f
+    in function of 50 different values of double well separation f
 
 '''
 
