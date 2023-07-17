@@ -2,27 +2,13 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
-def setting_inputs():
-    npri = 100
-    nst = 20
-    kp2 = 50
-    ncool = 200
-    kp = 50
-    #f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    return n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool
-
-n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool = setting_inputs()
+import inputs
+'''
+Computation of instanton density and action for instanton as function \
+    of coolingfor thre differnts value of eta
+'''
+#------------------setting inputs------------------------------------
+f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, kp2, ncool = inputs.qmcool()
 random.seed(seed)
 
 fn.directory('qmcool')
@@ -83,9 +69,9 @@ for loop in range(3):
         #cooling sweeps
         if i % kp2 == 0:
             ncoolconf += 1
+            Sc = fn.action(xs, n, a, f[loop])
+            ni, na, c, b     = fn.find_instantons(xs, a)
             
-            ni, na     = fn.instantons(f[loop], a, n, xs, xi, xa, z)
-            Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
             nin = ni + na
             nin_sum[0]   += nin
             nin2_sum[0]  += nin**2
@@ -93,16 +79,16 @@ for loop in range(3):
             scool2_sum[0]+= Sc**2
             for icool in range(1,ncool+1):                     
                xs = fn.cooling_update(xs, n, a, f[loop], dx)
+               Sc = fn.action(xs, n, a, f[loop])
+               ni, na, c, b     = fn.find_instantons(xs, a)
                
-               ni, na     = fn.instantons(f[loop], a, n, xs, xi, xa, z)
-               Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
                nin = ni + na
                nin_sum[icool]   += nin
                nin2_sum[icool]  += nin**2
                scool_sum[icool] += Sc
                scool2_sum[icool]+= Sc**2
             #--------------cooled configuration: instanton distribution  -------------|                          
-            fn.instanton_distribution(z, nin, tmax, stzhist, nzhist, iz)
+          #  fn.instanton_distribution(z, nin, tmax, stzhist, nzhist, iz)
     #   instanton density, cooled action                                       
     #------------------------------------------------------------------------------
 

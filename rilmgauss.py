@@ -2,67 +2,42 @@ import numpy as np
 import random
 from tqdm import tqdm
 import functions as fn
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-#     Random instanton calculation in quantum mechanics                     
-#------------------------------------------------------------------------------
-#     action m/2(\dot x)^2+k(x^2-f^2)^2, units 2m=k=1                       
-#------------------------------------------------------------------------------
-#     program follows units and conventions of txt file
-#------------------------------------------------------------------------------
-#   Input:
-#------------------------------------------------------------------------------
-#   f       minimum of harmonic oxillator: (x^2-f^2)^2
-#   n       number of lattice points in the euclidean time direction (n=800)
-#   a       lattice spacing (a=0.05)
-#   N_I+A   number of instantons(has to be even). The program displays the one 
-#           and two-loop results for the parameters
-#   nmc     number of Monte Carlo sweeps (nmc=10^5)
-#   n_p      number of points on which the correlation functions are measured: 
-#           <x_i x_(i+1)>,...,<x_i x_(i+np)> (np=20)
-#   nc      number of correlator measurements in a single configuration (nc=5)                               
-#   kp      number of sweeps between writeout of complete configuration    
-#   nheat   number of heating steps (nheat = 10) 
-#------------------------------------------------------------------------------
-#   Output:
-#------------------------------------------------------------------------------
-#   Stot        average total action per configuration
-#   Vav, Tav    average potential and kinetic energy
-#   <x^n>       expectation value <x^n> (n=1,2,3,4)
-#   Pi(tau)     euclidean correlation function Pi(tau)=<O(0)O(tau)>,
-#               for O=x,x^2,x^3;results are given in the format: tau, Pi(tau),
-#               DeltaPi(tau), dlog(Pi)/dtau, Delta[dlog(Pi)/dtau],where 
-#               DeltaPi(tau) is the statistical error in Pi(tau)
-#------------------------------------------------------------------------------
-
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    N_tot = 10 #instanton
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 35 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    nheat = 10
-    seed = 597
-    return f, n, a, neq, nmc, dx, n_p, nc, kp, N_tot,nheat, seed
-
-
-f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst,nheat, seed = setting_inputs()
+import inputs
+'''
+This program generates the same random instanton ensemble as rilm.py\
+    but it also includes Gaussian fluctuations\
+        around the classical path. This is done by performing a few\
+            heating sweeps in the Gaussian effective potential
+Instanton distribution is saved in output file 'hist_z_riilm'
+Input:
+------------------------------------------------------------------------------
+   f       minimum of harmonic oxillator: (x^2-f^2)^2
+   n       number of lattice points in the euclidean time direction (n=800)
+   a       lattice spacing (a=0.05)
+   N_inst   number of instantons(has to be even).
+   nmc     number of Monte Carlo sweeps (nmc=10^5)
+   n_p      number of points on which the correlation functions are measured: 
+           <x_i x_(i+1)>,...,<x_i x_(i+np)> (np=20)
+   nc      number of correlator measurements in a single configuration (nc=5)                               
+   kp      number of sweeps between writeout of complete configuration 
+   nheat   number of heating steps (nheat = 10)
+   dx      gaussian update width
+-------------------------------------------------------------------------------
+Output:
+    Stot        average total action per configuration
+    Vav, Tav    average potential and kinetic energy
+    <x^n>       expectation value <x^n> (n=1,2,4)
+    Pi(tau)     euclidean correlation function Pi(tau)=<O(0)O(tau)>,
+                for O=x,x^2,x^3;results are given in the format: tau, Pi(tau),
+                     DeltaPi(tau), dlog(Pi)/dtau, Delta[dlog(Pi)/dtau],where 
+                         DeltaPi(tau) is the statistical error in Pi(tau)
+    iz          Instanton distribution
+'''
+#----------------input parameters------------------------------------------------
+f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst,nheat, seed = inputs.rilmgauss()
 #random.seed(seed)
 #-------defining constants-------------------------------------------------------|
-pi    = np.pi
 tmax  = n*a
-s0    = 4.0/3.0*f**3
-dens  = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0)
-dens2 = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0-71.0/72.0/s0)
-xnin  = dens*tmax 
-xnin2 = dens2*tmax
-nexp  = int(xnin+0.5)
-nexp2 = int(xnin2+0.5)
 #--------opening output files----------------------------------------------------|
 fn.directory('rilmgauss')
 
@@ -97,13 +72,9 @@ correlations3.write("x3 correlation function\n")
 histz = open('Data/rilmgauss/hist_z_rilmgauss.dat', 'w')
 histz.write('xx iz[i]\n')
 #   parameters for histograms                                              
-#------------------------------------------------------------------------------      
-nxhist    = 50
-xhist_min = -1.5*f
-stxhist   = 3.0*f/float(nxhist)
+#------------------------------------------------------------------------------
 nzhist    = 40
 stzhist   = 4.01/float(nzhist)
-xnorm = 0
 #------------------------------------------------------------------------------
 #   inizialize                                                 
 #------------------------------------------------------------------------------
@@ -123,7 +94,7 @@ x2_sum    = 0.0
 x4_sum    = 0.0
 x8_sum    = 0.0
 
-histo_x    = np.zeros(nxhist)
+
 iz         = np.zeros(nzhist)
 x          =  np.zeros(n+1)
 x_hot      = np.zeros(n+1)
@@ -150,8 +121,7 @@ x3cor2_sum = np.zeros(n_p)
 #------------------------------------------------------------------------------
 for i in tqdm(range(nmc)):
     nconf += 1
-    for k in range(N_inst):
-        z[k] = random.random()*tmax
+    z = np.random.uniform(0, tmax, size = N_inst)
     z = np.sort(z)
     x = fn.new_config(x, n, N_inst, z, f, a)
     #   distribution of instantons                                             

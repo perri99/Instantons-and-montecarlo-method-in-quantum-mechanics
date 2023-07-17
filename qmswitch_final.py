@@ -2,28 +2,14 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
+import inputs
 '''
 This programme runs in loop qmswitch.py in order to compute 6 values\
     of the free enrgy for differetn values of temperature(inverse of euclidean time)
 '''
 
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_alpha = 20 #number of switch
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    w0 = 5.6
-    return n, f,  a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
-
 #--------------------------setting inputs------------------------------------
-n, f, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
+n, f, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = inputs.qmswitch()
 random.seed(seed)
 #--------------------------output files--------------------------------------
 fn.directory('qmswitch')
@@ -121,7 +107,7 @@ for index in range(6):
        
     #----------------end of loops over coupling constant alpha---------------------|
     #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-    ei, de_tot = fn.summing(n_alpha, dalpha, e0, Va_av, Va_err)
+    ei, de_tot = fn.summing(n_alpha, dalpha, Va_av, Va_err, e0)
                                                                             
     
     #----------------outputs----------------------------------------------

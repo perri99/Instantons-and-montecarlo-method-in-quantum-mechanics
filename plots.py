@@ -462,7 +462,7 @@ y     = np.array(column2)/(n*a)
 
 
 plt.errorbar(x, y, fmt ='s', markerfacecolor = 'none',
-             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = 'f = 1.4')
+             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = '\u03b7 = 1.4')
 
 y     = np.array(column3)/(n*a)
 plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--', label = '2-loop')
@@ -488,7 +488,7 @@ y     = np.array(column2)/(n*a)
 
 
 plt.errorbar(x, y, fmt ='o', markerfacecolor = 'none',
-             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = 'f = 1.5')
+             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = '\u03b7 = 1.5')
 
 y     = np.array(column3)/(n*a)
 plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--')
@@ -511,7 +511,7 @@ y     = np.array(column2)/(n*a)
 
 
 plt.errorbar(x, y, fmt ='v', markerfacecolor = 'none',
-             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = 'f = 1.6')
+             markeredgecolor = 'blue', markersize = 8, capsize = 5, label = '\u03b7 = 1.6')
 
 y     = np.array(column3)/(n*a)
 plt.plot(x, y, color = 'green', linewidth = 0.8, linestyle = '--')
@@ -555,7 +555,7 @@ y     = np.array(column2)
 y_err = np.array(column3)
 
 plt.errorbar(x, y, yerr=y_err, fmt='s',markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.4')
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '\u03b7 = 1.4')
 
 y     = np.array(column4)
 
@@ -578,7 +578,7 @@ y     = np.array(column2)
 y_err = np.array(column3)
 
 plt.errorbar(x, y, yerr=y_err, fmt='o',markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.5')
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '\u03b7 = 1.5')
 
 y     = np.array(column4)
 
@@ -598,7 +598,7 @@ y     = np.array(column2)
 y_err = np.array(column3)
 
 plt.errorbar(x, y, yerr=y_err, fmt='v',markerfacecolor='none',
-             markeredgecolor = 'blue', markersize=8, capsize=5, label = 'f = 1.6')
+             markeredgecolor = 'blue', markersize=8, capsize=5, label = '\u03b7 = 1.6')
 
 y     = np.array(column4)
 
@@ -672,7 +672,7 @@ plt.yscale('log')
 plt.ylim(0.01, 3.1)
 plt.xlim(0, 1.85)
 plt.legend()
-plt.xlabel('f')
+plt.xlabel('\u03b7')
 plt.ylabel('N_top/\u03B2')
 plt.savefig('Data/fig8.pdf')
 plt.savefig('Data/fig8.png')
@@ -1111,7 +1111,7 @@ plt.xlabel('τ_z')
 plt.ylabel('n_IA(τ_z)')
 plt.title('Istanton-anti-istanton separation distribution')
 plt.xlim(0,3.85)
-plt.ylim(0,40000)
+plt.ylim(0,45000)
 plt.legend()
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.pdf')
 plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.png')
@@ -1287,7 +1287,7 @@ y_err = np.array(column3)
 plt.errorbar(x, y, yerr=y_err, fmt='s', markerfacecolor='none',
              markeredgecolor = 'green', markersize=8, capsize=5, label = 'dlog<x^2(0)x^2(τ)>')
 plt.legend()
-plt.ylim(-0.2, 0, 6)
+plt.ylim(-0.2, 6)
 plt.xlim(0, 1.5)
 #plt.title('Logarithmic derivatives of correlation functions')
 plt.xlabel('time')

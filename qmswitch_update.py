@@ -2,6 +2,7 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
+import inputs
 '''
 Computation of the free energy of the anharmonic oscillator by means\
     of adiabatic switching: S = S0 + alpha(S-S0)
@@ -11,23 +12,9 @@ This program only evaluate the value of the free energy for a fixed\
         qmswitch_loop.py
 Details of adiabatic switching procedure are saved in the output file
 '''
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**4 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_alpha = 20 #number of switch
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    w0 = 5.6
-    return f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
 
 #------------------------setting inputs-----------------------------------
-f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
+f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = inputs.qmswitch()
 random.seed(seed)
 #------------------------output files------------------------------------
 fn.directory('qmswitch')

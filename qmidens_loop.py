@@ -2,41 +2,21 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-import os
+import inputs
 '''
-------------------------------------------------------------------------------
-   Lattice calculation in quantum mechanics                                                                         
-------------------------------------------------------------------------------
-   Action m/2(\dot x)^2+k(x^2-f^2)^2, units 2m=k=1 
-------------------------------------------------------------------------------
-   Calculate instanton density by adiabatically switching from gaussian
-   approximation to full potential. Have d(inst)=d(gaussian)*exp(-S(non-gaussian)) 
+   Calculate instanton density as function of eta parameter\
+       by adiabatically switching from gaussian
+   approximation to full potential.\
+       Have d(inst)=d(gaussian)*exp(-S(non-gaussian)) 
    where S(non-gaussian)=\int d\alpha <S-S(gaussian)>_\alpha. Perform
    reference calculation of fluctuations around trivial vacuum.
-------------------------------------------------------------------------------
+
    Instanton is placed at beta/2. anti-symmetric boundary conditions are
    used. position is fixed during update by requiring x(beta/2)=0
-------------------------------------------------------------------------------
-'''
-#   Input parameters 
-#------------------------------------------------------------------------------
 
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**4 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_alpha = 20 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    w0 = 5.6
-    return f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0
+'''
 #-------initialize inputs------------------------------------------------------|
-f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = setting_inputs()
+f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = inputs.qmidens()
 random.seed(seed)
 
 fn.directory('qmidens')
@@ -65,7 +45,7 @@ for loop in range(10):
     beta   = n*a
     tau0   = beta/2.0
     s0   = 4.0/3.0*f[loop]**3     #classical action for instanton solution
-    dens = 8*np.sqrt(2.0/pi)*f[loop]**2.5*np.exp(-s0)   #unperturbed tunneling rate
+    dens = 8*np.sqrt(2.0/pi) * f[loop]**2.5 * np.exp(-s0)   #1-loop tunneling rate
     f0   = dens
     #------initialize instanton and gaussian potential-----------------------------|
     x_inst = fn.initialize_instanton(n, a, f[loop], tau0)
@@ -137,27 +117,13 @@ for loop in range(10):
         svacng += dsvacng
     #----------------end of loops over coupling constant alpha---------------------|
     #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-    supinst_sum, supinst_err, supinst_hal, sdwinst_sum, sdwinst_err, sdwinst_hal = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
-    svacup_sum, svacup_err, svacup_hal, svacdw_sum, svacdw_err, svacdw_hal = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
-    #   uncertainties                                                                         
-    #------------------------------------------------------------------------------
-    ds     = supinst_sum + sdwinst_sum
-    sng    = ds
-    dens_ng= dens*np.exp(-sng)
-    ds_err = np.sqrt(supinst_err + sdwinst_err)
-    ds_hal = supinst_hal + sdwinst_hal
-    ds_dif = abs(supinst_sum - sdwinst_sum)
-    ds_dis = abs(ds - ds_hal)/2.0
-    ds_tot = np.sqrt(ds_err**2 + ds_dif**2 + ds_dis**2)
-    dens_er= dens_ng*ds_tot 
-    dsvac     = svacup_sum + svacdw_sum
-    svacng    = dsvac
+    sng, ds_tot = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
+    svacng, dsvac_tot = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
+
+    dens_ng = dens*np.exp(-sng)
+    dens_er = dens_ng*ds_tot 
+
     fvac      = np.exp(-svacng)
-    dsvac_err = np.sqrt(svacup_err + svacdw_err)
-    dsvac_hal = svacup_hal + svacdw_hal
-    dsvac_dif = abs(svacup_sum - svacdw_sum)
-    dsvac_dis = abs(dsvac - dsvac_hal)/2.0
-    dsvac_tot = np.sqrt(dsvac_err**2 + dsvac_dif**2 + dsvac_dis**2)
     fvac_er   = fvac*dsvac_tot 
     # final answer                                                                          
     #------------------------------------------------------------------------------

@@ -2,6 +2,8 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
+import inputs
+
 '''
 Montecarlo simulation of one non relativistic particle\
     in a double well potential.
@@ -11,27 +13,13 @@ This programme computes:
     3. average quantities (action, position, energies....)
 '''
 
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 35 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # mode=0: cold start, x_i=-f; mode != 0: hot start, x_i=random
-    seed = 597
-    return f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed
-
 #-----inputs initialization-----------------------------------------|
-f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed = setting_inputs()
+f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed = inputs.qm()
 tmax = n*a
 random.seed(seed)
 #-----output files--------------------------------------------------|
 fn.directory('qm')
-        
+
 config1 = open('Data/qm/config1.dat', 'w')
 config1.write('configuration, Action, Kinetic, Potential\n')
 

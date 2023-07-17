@@ -5,7 +5,7 @@ from functions import directory
 from tqdm import tqdm
 '''
 This programme computes the spectrum of the double well potential\
-    in function of 50 different values of double well separation f
+    in function of different values of double well separation f
 
 '''
 
@@ -16,7 +16,6 @@ split = open('Data/qmdiag/splitting.dat', 'w')
 #-----------spectrum with different f------------------------------------------|
 x_min, x_max, minimum, mass, point_num = sc.initialize_param()
 Step = (x_max-x_min)/(point_num - 1)
-
 x = np.linspace(x_min, x_max, point_num)
 f = np.linspace(0,3,50)
 
@@ -32,7 +31,7 @@ for i in range (6):
     plt.plot(f, eigenvals[i,:], label = 'Eigenvalue '+str(i))
 
 plt.title('First six eigenvalues')    
-plt.xlabel('f: well separation')
+plt.xlabel('\u03b7: well separation')
 plt.ylabel('Energy')
 plt.savefig('Data/qmdiag/spectrum.pdf')
 plt.savefig('Data/qmdiag/spectrum.png')

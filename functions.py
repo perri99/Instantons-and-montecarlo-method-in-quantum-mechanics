@@ -31,22 +31,7 @@ def directory(name):
     folder_path = os.path.join(data_folder, subfolder)
     if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-#---------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------       
-@nb.jit(nopython = True)
-def normalization(x,dx):
-    '''
-    returns the array x normalized to 1 w.r.t. euclidean metric \n
-    Parameters:
-    ------------------------
-        x: array-like
-        dx: floating type \n
-    Return:  
-    ------------------------
-        x/norm: array-like
-    '''
-    norm = np.sqrt(np.sum(x**2 * dx))
-    return x/norm
+
 #-------------------------------------------------------------------------------------|
 #------------------------------------------------------------------------------|
 @nb.jit(nopython = True)
@@ -167,11 +152,6 @@ def action_switch(x,n,a,w0,f,alpha):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def action_local(x, j, n, a, f): #contribution to the action from the j-th point of configuration
-    return (1/(4*a))*(x[j]-x[j-1])**2+a*(x[j]**2-f**2)**2 + (1/(4*a))*(x[j+1]-x[j])**2
-#---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
-@nb.jit(nopython = True)
 def kinetic(x,n,a):
     K = 0
     for j in range(n):
@@ -232,6 +212,30 @@ def potential_diff(x, n, a, f, w0):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def hardcore_interaction(z, nin, tcore, score, tmax, s0):
+    '''
+    hardcore interaction among instantons
+
+    Parameters
+    ----------
+    z : array (float)
+        instanton time locations array.
+    nin : int
+        instanton number.
+    tcore : float
+        hardcore interaction range.
+    score : float
+        hardcore interaction strength.
+    tmax : float
+        higher bound on euclidean time.
+    s0 : float
+        classical instanton action.
+
+    Returns
+    -------
+    hardcore_action : float
+        hardcore interaction.
+
+    '''
     hardcore_action = 0.0
     if tcore == 0:
         return hardcore_action 
@@ -452,27 +456,37 @@ def compute_energy_switch(x,n, a ,f, w0, alpha):
     S = V + T
     P = potential_diff(x, n, a, f, w0)
     return S, V, P
+
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def update_periodic(x, n, a, f, dx): #metropolis alghorhitm
-    for j in range(1,n):
-        S_old = action_local(x, j, n, a, f)
-        x_old = x[j]
-        x[j]  = x[j] + dx*(2.0*random.random()-1.0)
-        S_new = action_local(x, j, n, a, f)
-        delta_S = S_new-S_old
-        delta_S = min(delta_S, 69.0)
-        delta_S = max(delta_S, -69.0)
-        if delta_S >= 0 and np.exp(-delta_S) <= random.random():
-            x[j] = x_old
-    x[n-1] = x[0]
-    x[n] = x[1]
-    return x
-#---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
-@nb.jit(nopython = True)
-def update_periodic_switch(x,n,a,f, w0, alpha, dx): #metropolis alghorhitm for adiabatic switching
+def update_periodic_switch(x,n,a,f, w0, alpha, dx): 
+    '''
+    metropolis algorithm for adiabatic switching\
+        periodic boundary conditions are used
+    Parameters
+    ----------
+    x : array(float)
+        configuration.
+    n : int
+        lattice points.
+    a : float
+        lattice discretization.
+    f : float
+        double well separation.
+    w0 : float
+        frequency of the reference harmonic oscillator.
+    alpha : float
+        adiabatic switching cupling constant.
+    dx : float
+        gaussian width of update.
+
+    Returns
+    -------
+    x : array(float)
+        updated configuration.
+
+    '''
     for j in range(n):
         S_old = action_switch_local(x, j, n, a, f, w0, alpha)
         x_old = x[j]
@@ -527,6 +541,32 @@ def cooling_update(xs,n,a,f,dx):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def heating_update(x_hot, x, n, nheat, a, f, dx):
+    '''
+    metropolis algorithm for heating update
+
+    Parameters
+    ----------
+    x_hot : array (float)
+        initial configuration.
+    x : array (float)
+        initial reference configuration.
+    n : int
+        lattice points.
+    nheat : int
+        number of heating sweeps.
+    a : float
+        lattice discretization.
+    f : float
+        double well separation.
+    dx : float
+        gaussian update width.
+
+    Returns
+    -------
+    x_hot : array (float)
+        hot configuration.
+
+    '''
     w = -4.0*(f**2-3.0*x**2)
     for ih in range(nheat):
         for j in range(1, n): 
@@ -570,6 +610,38 @@ def fluctuations_total_potential(x,x0,w,vi,f,a, alpha, n):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_instanton(x, x0, w, vi, n, a, f, alpha, dx):
+    '''
+    metropolis algorithm for adiabatic updating instanton configurations\
+        constraint are used to fix instanton time location.\
+            Anti periodic boundary conditions are used.
+
+    Parameters
+    ----------
+    x : array(float)
+        input configuration.
+    x0 : array (float)
+        reference configuration.
+    w : array
+        gaussian potential.
+    vi : array
+        potential array.
+    n : int
+        lattice points.
+    a : float
+        lattice discretization.
+    f : float
+        double well separtion.
+    alpha : int
+        adiabatic coupling.
+    dx : float
+        update width.
+
+    Returns
+    -------
+    x : array(float)
+        updated instanton configuration.
+
+    '''
     n0     = n/2
     n0p    = int(n0+1)
     n0m    = int(n0-1)
@@ -604,6 +676,43 @@ def update_instanton(x, x0, w, vi, n, a, f, alpha, dx):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
+    '''
+    metropolis algorithm for instanton configuration \
+        affected by hardcore interaction
+
+    Parameters
+    ----------
+    nin : int
+        instanton number.
+    z : array(float)
+        instanton time location array.
+    tmax : float
+        higher bound on euclidean time.
+    tcore : float
+        hardcore interaction range.
+    score : float
+        hardcore interaction strength.
+    dz : float
+        update width.
+    x : array (float)
+        configuration.
+    n : int
+        lattice points.
+    a : float
+        lattice discretization.
+    f : float
+        double well separation.
+    s0 : float
+        instanto classical action.
+
+    Returns
+    -------
+    z : array(float)
+        updated instanton time location array.
+    x : array(float)
+        updated configuration.
+
+    '''
     for iin in range(nin):
         sold   = action(x,n,a,f)
         sold  += hardcore_interaction(z, nin, tcore, score, tmax, s0)
@@ -635,6 +744,37 @@ def update_interacting_instanton(nin, z, tmax,tcore, score, dz, x, n, a, f, s0):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def update_vacuum(x,x0,w,vi,n,a,f,alpha,dx):
+    '''
+    metropolis algorithm for vacuum config. updating around vacuum fluctuations\
+        periodic boundary conditions are used.
+
+    Parameters
+    ----------
+   x : array(float)
+       input configuration.
+   x0 : array (float)
+       reference configuration.
+   w : array
+       gaussian potential.
+   vi : array
+       potential array.
+   n : int
+       lattice points.
+   a : float
+       lattice discretization.
+   f : float
+       double well separtion.
+   alpha : int
+       adiabatic coupling.
+   dx : float
+       update width.
+
+    Returns
+    -------
+    x : array(float)
+        updated vacuum configuration.
+
+    '''
     for j in range(n):
         S_old = (1/(4*a))*(x[j]-x[j-1])**2 + (1/(4*a))*(x[j+1]-x[j])**2 + fluctuations_potential(x,x0,w,vi,f,a, alpha, j)
         x_old = x[j]
@@ -896,7 +1036,7 @@ def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
     '''
     for ii in range(0, nin, 2):
         if ii == 0:
-            zm =  -tmax
+            zm = z[nin] -tmax
         else:
             zm = z[ii-1]
         z0  = z[ii]
@@ -942,7 +1082,7 @@ def building_wavefunction(hist, nxhist, stxhist, xhist_min):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def summing(n_alpha, dalpha, e0, Va_av, Va_err):
+def summing(n_alpha, dalpha, Va_av, Va_err, e0 = 0):
     '''
     performing the integral over adiabatic coupling constant alpha 
 
@@ -1049,6 +1189,7 @@ def instantons(a, n, x, xi, xa, z):
             xa[na] = tau
             z[nin] = tau                     
         p = ixp
+    #z = np.delete(z, 0)
     return ni, na
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
@@ -1227,52 +1368,52 @@ def streamline_equation(n_lattice_half, r_initial_sep,\
         
         if s > 0.0001:
             if s /s0 > 1.8:
-                print(1.8)
+               
                 for k in range(len(tau_array)):
                     conf1.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action1.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 1.6 :
-                print(1.6)
+                
                 for k in range(len(tau_array)):
                     conf2.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action2.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 1.4 :
-                print(1.4)
+                
                 for k in range(len(tau_array)):
                     conf3.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action3.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 1.2 :
-                print(1.2)
+                
                 for k in range(len(tau_array)):
                     conf4.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action4.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 1.0 :
-                print(1.0)
+                
                 for k in range(len(tau_array)):
                     conf5.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action5.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 0.8 :
-                print(0.8)
+                
                 for k in range(len(tau_array)):
                     conf6.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action6.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 0.6 :
-                print(0.6)
+                
                 for k in range(len(tau_array)):
                     conf7.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action7.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 0.4 :
-                print(0.4)
+                
                 for k in range(len(tau_array)):
                     conf8.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2])) 
                     action8.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             elif s /s0 > 0.2 :
-                print(0.2)
+                
                 for k in range(len(tau_array)):
                     conf9.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action9.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
             else:
-                print(0.1)
+                
                 for k in range(len(tau_array)):
                     conf10.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], xconf[k+2]))
                     action10.write('{:.4f}\t{:.4f}\n'.format(tau_array[k], action_density[k]))
@@ -1431,13 +1572,14 @@ def cool_zero_crossing1(nmc, ncool, n = 800, dtau = 0.05, f = 1.4, mode = 0,\
         if i % kp2 == 0:
             for icool in range(ncool):
                 xs = cooling_update(xs, n, dtau, f, dx)
-            n_instantons, n_anti_instantons = instantons(f, dtau, n, xs, xi, xa, z)
+            n_instantons, n_anti_instantons = instantons(dtau, n, xs, xi, xa, z)
+            print(z)                                             
             s = action(xs, n, dtau, f)
             n_inst = n_instantons + n_anti_instantons
             if n_inst == 2:
-                for ii in range(0, n_inst, 2):
+                for ii in range(1, n_inst, 2):
                     if ii == 0:
-                        zm =  -n * dtau
+                        zm = z[n_inst] -n * dtau
                     else:
                         zm = z[ii-1]
                     z0  = z[ii]
@@ -1454,7 +1596,7 @@ def cool_zero_crossing1(nmc, ncool, n = 800, dtau = 0.05, f = 1.4, mode = 0,\
     tau_ia_zcr = tau_ia_zcr[permute]
     n_inst_array = n_inst_array[permute]
     action_int_zcr = action_int_zcr[permute]
-    action_int_zcr /= s0
+    action_int_zcr /= (2*s0)
     action_int_zcr -= 2
     print(snc)
     print('Action: '+'{:.4f}\n'.format(S_sum/counter)+ 'Instantons: '+'{:.4f}'.format(N_sum/counter))

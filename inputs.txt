@@ -1,0 +1,74 @@
+Minimum of anharmonic oscillator potential (x^2 - f^2)^2
+f      = 1.4
+
+Unperturbed oscillator frequency (choose w0 ~ 4f)
+w0     = 5.6
+
+Number of lattice points in the euclidean time direction (n ~ 800)
+n      = 800
+
+Lattice spacing (a ∼ 0.05)
+a      = 0.05
+
+Choose 0 (cold start), choose 1 (hot start)
+mode  = 1
+
+Number of equilibration sweeps before first measurement (neq ∼ 100)
+neq    = 100
+
+Number of Monte Carlo sweeps (nmc > 10^4 ∼ 10^5)
+nmc    = 100000
+
+Width of Gaussian distribution used for Monte Carlo update x(n) (dx ∼ 0.5)
+dx   = 0.5
+
+Number of points on which correlation functions are measured
+n_p    = 35
+
+Number of measurements per configuration
+nc     = 5
+
+Number of sweeps between writeout of complete configuration
+kp     = 50
+
+Number of sweeps between cooling
+kp2    = 50
+
+Number of cooling sweeps (ncool<5000)
+ncool  = 200
+
+Number of steps in adiabatic switching (nswitch ∼ 20)
+n_alpha = 20
+
+Number of instantons for random generation (even, ∼ 10)
+N_inst    = 10
+
+Number of heating steps (nheat ∼ 10)
+nheat  = 10
+
+Position update dz 
+dz     = 1.0
+
+Hard core radius rcore  (0.3)
+tcore  = 0.3     
+         
+Hard core strength A  (3.0)
+acore  = 3.0
+
+Random seed
+seed   = 420
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

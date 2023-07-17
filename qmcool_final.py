@@ -2,27 +2,19 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
-def setting_inputs():
-    npri = 100
-    nst = 20
-    kp2 = 50
-    ncool = 200
-    kp = 50
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 35 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 1 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    return f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool
-
-f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool = setting_inputs()
+import inputs
+'''
+Montecarlo implementation with cooling procedures. This programme computes \
+    the same things of qm.py but with cooled configuration. Analysis\
+        of instanton content is carried out
+Relevant outputs:
+    1. correlation functions and their log derivatives for cooled configuration
+    2. instanton density as function of cooling sweeps
+    3. instanton action as function of cooling sweeps
+    4. instanton distribution
+'''
+#-----------setting inputs--------------------------------------------------
+f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, kp2, ncool = inputs.qmcool()
 random.seed(seed)
 #----------- setting constants--------------------------------------------------|
 pi  = np.pi
@@ -81,7 +73,7 @@ ncoolconf = 0
 ncoolcor  = 0
 #-------histogram parameters----------------------------------------|
 nzhist = 40
-stzhist = 4.01 / float(nzhist)
+stzhist = 4.0 / float(nzhist)
 
 #-------variable definitions----------------------------------------|
 S_sum = 0.0
@@ -216,7 +208,7 @@ for i in tqdm(range(nmc)):
     if i % kp2 == 0:
         ncoolconf += 1
         
-        ni, na     = fn.instantons(f, a, n, xs, xi, xa, z)
+        ni, na     = fn.instantons(a, n, xs, xi, xa, z)
         Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f)
         nin = ni + na
         nin_sum[0]   += nin
@@ -226,7 +218,7 @@ for i in tqdm(range(nmc)):
         for icool in range(1,ncool+1):                     
            xs = fn.cooling_update(xs, n, a, f, dx)
            
-           ni, na     = fn.instantons(f, a, n, xs, xi, xa, z)
+           ni, na     = fn.instantons( a, n, xs, xi, xa, z)
            Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f)
            nin = ni + na
            nin_sum[icool]   += nin
@@ -290,15 +282,15 @@ averages.write("\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".form
 averages.write('\t e_av, e_err, x_av, x_err, x2_av,x2_err, x4_av, x4_err\n')  
 averages.write("\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(e_av, e_err, x_av, x_err, x2_av, x2_err, x4_av, x4_err))
 #----------log derivatives------------------------------------------------------------|"""
-dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a, n_p)
-x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er, n_p) #substracting
-dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a, n_p)
-dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a, n_p)
+dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a)
+x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er) #substracting
+dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a)
+dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a)
 
-dxc, dxec = fn.log_derivatives(xcool_av, xcool_er, a, n_p)
-x2subc_av, x2subc_er = fn.substract(x2cool_av, x2cool_er, n_p) #substracting
-dx2c, dxe2c = fn.log_derivatives(x2subc_av, x2subc_er, a, n_p)
-dx3c, dxe3c = fn.log_derivatives(x3cool_av, x3cool_er, a, n_p)
+dxc, dxec = fn.log_derivatives(xcool_av, xcool_er, a)
+x2subc_av, x2subc_er = fn.substract(x2cool_av, x2cool_er) #substracting
+dx2c, dxe2c = fn.log_derivatives(x2subc_av, x2subc_er, a)
+dx3c, dxe3c = fn.log_derivatives(x3cool_av, x3cool_er, a)
 
 #output log derivatives
 for ip in range(n_p-1):

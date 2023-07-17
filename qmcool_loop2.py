@@ -2,32 +2,18 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
-def setting_inputs():
-    npri = 100
-    nst = 20
-    kp2 = 50
-    ncool = 10
-    kp = 50
-    #f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 20 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    mode = 0 # ih=0: cold start, x_i=-f; ih=1: hot start, x_i=random
-    seed = 597
-    return n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool
-
-n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, npri, nst, kp2, ncool = setting_inputs()
+import inputs
+'''
+Computations of instanton density as function of eta (double well separation)\
+    after 10 cooling sweeps
+'''
+#----------------------setting inputs-----------------------------------------------
+f, n, a, neq, nmc, dx, n_p, nc, kp, mode, seed, kp2, ncool = inputs.qmcool()
 random.seed(seed)
-
+#--------------------output file----------------------------------------------------
 fn.directory('qmcool')
 instdensity = open('Data/qmcool/instdensity_varf.dat', 'w')
-
+#------------------loops over etas--------------------------------------------------
 f = np.linspace(0.25, 1.75, num = 10)
 for loop in range(10):
     #----------- setting constants--------------------------------------------------|

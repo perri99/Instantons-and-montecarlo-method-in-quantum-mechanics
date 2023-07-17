@@ -2,28 +2,45 @@ import numpy as np
 from tqdm import tqdm
 import random
 import functions as fn
+import inputs
+'''
+This program computes correlation functions of the anharmonic oscillator\
+    using an interacting ensemble of instantons.\
+        The multi-instanton configuration is constructed using the\sum ansatz.
+The configuration is discretized on a lattice and the total action is computed
+using the discretized lattice action.\
+    Very close instanton-anti-instanton pairs are excluded by adding \
+        a nearest neighbor interaction with a repulsive core (hardcore interaction)
+Inputs:
+-------------------------------------------------------------------------------    
+    f       minimum of harmonic oxillator: (x^2-f^2)^2
+    n       number of lattice points in the euclidean time direction (n=800)
+    a       lattice spacing (a=0.05)
+    N_inst   number of instantons(has to be even).
+    nmc     number of Monte Carlo sweeps (nmc=10^5)
+    n_p      number of points on which the correlation functions are measured: 
+            <x_i x_(i+1)>,...,<x_i x_(i+np)> (np=20)
+    nc      number of correlator measurements in a single configuration (nc=5)                               
+    kp      number of sweeps between writeout of complete configuration
+    tcore   hardcore interaction range (0.3)
+    acore   interaction strength (3.0)
+    dz      average instanton location update width
+Outputs:
+-------------------------------------------------------------------------------
+    Stot        average total action per configuration
+    Vav, Tav    average potential and kinetic energy
+    <x^n>       expectation value <x^n> (n=1,2,4)
+    Pi(tau)     euclidean correlation function Pi(tau)=<O(0)O(tau)>,
+                for O=x,x^2,x^3;results are given in the format: tau, Pi(tau),
+                     DeltaPi(tau), dlog(Pi)/dtau, Delta[dlog(Pi)/dtau],where 
+                         DeltaPi(tau) is the statistical error in Pi(tau)
+    iz          Instanton distribution
+'''
+#---------------------setting inputs---------------------------------------------
 
-
-def setting_inputs():
-    f = 1.4 #minimum of the potential
-    n = 800 #lattice points
-    a = 0.05 #lattice spacing
-    N_tot = 10 #instanton
-    neq = 100 #number of equilibration sweeps
-    nmc = 10**5 #number of MonteCarlo sweeps
-    dx = 0.5 #width of updates
-    n_p = 35 #number max of points in the correlation functions
-    nc = 5 #number of correlator measurements in a configuration
-    kp = 50 #number of sweeps between writeout of complete configuration 
-    tcore = 0.3
-    acore = 3.0
-    dz = 1
-    seed = 123456
-    return f, n, a, neq, nmc, dx, n_p, nc, kp, N_tot, tcore, acore, dz, seed
-
-f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, tcore, score, dz, seed = setting_inputs()
+f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, tcore, score, dz, seed = inputs.iilm()
 #random.seed(seed)
-'''----------Definitions-------------------------------------------------------'''
+#'''----------Definitions-------------------------------------------------------'''
 pi    = np.pi
 tcore = tcore/f
 tmax  = n*a
@@ -35,7 +52,7 @@ xnin  = dens*tmax         # LO total tunneling events
 xnin2 = dens2*tmax        #NLO total tunneling events
 nexp  = int(xnin+0.5)
 nexp2 = int(xnin2+0.5)
-'''-------------outputs file---------------------------------------------------'''
+#'''-------------outputs file---------------------------------------------------'''
 fn.directory('iilm')
         
 iilm = open('Data/iilm/iilm.dat', 'w')
@@ -50,11 +67,11 @@ icor2 = open('Data/iilm/icor2_iilm.dat', 'w')
 icor3 = open('Data/iilm/icor3_iilm.dat', 'w')
 iconf = open('Data/iilm/iconf_iilm.dat', 'w')
 zdist = open('Data/iilm/zdist.dat', 'w')
-sia  = open('Data/iilm/sia.dat', 'w')
-'''#     parameters for histograms                                              
+
+#'''#     parameters for histograms                                              
 #------------------------------------------------------------------------------|'''
 nzhist    = 40
-stzhist   = 4.01/float(nzhist) 
+stzhist   = 4.0/float(nzhist) 
 #------------------------------------------------------------------------------
 nconf = 0
 ncor  = 0
@@ -70,7 +87,7 @@ x_sum     = 0.0
 x2_sum    = 0.0
 x4_sum    = 0.0
 x8_sum    = 0.0
-'''-------Array Defintions-----------------------------------------------------'''
+#'''-------Array Defintions-----------------------------------------------------'''
 z          = np.zeros(N_inst)
 x          = np.zeros(n+1)
 iz         = np.zeros(nzhist)
@@ -90,18 +107,7 @@ x3cor_sum  = np.zeros(n_p)
 x3cor2_sum = np.zeros(n_p)     
 #   plot S_IA                                                              
 #------------------------------------------------------------------------------
-ni = n//4
-sia.write('(na-ni)*a\t S/s0 - 2\n')
-for na in range(ni, ni*2):
-    z[0] = ni*a
-    z[1] = na*a
-    x = fn.new_config(x, n, 2, z, f, a)
-    T = fn.kinetic(x, n, a)
-    V = fn.potential(x, n, a, f)
-    S = T+V
-    S  += fn.hardcore_interaction(z, 2, tcore, score, tmax, s0)
-    sia.write('{:.4f}\t{:.4f}\n'.format((na-ni)*a, S/s0-2.0))
-#   setup and intial action                                                
+#   setup                                               
 #------------------------------------------------------------------------------
 z = np.random.uniform(0, tmax, size = N_inst)
 z = np.sort(z)
@@ -140,7 +146,7 @@ for i in tqdm(range(nmc)):
         iconf.write('\n')
     fn.instanton_distribution(z, N_inst, tmax, stzhist, nzhist, iz)
     #   action etc.                                                            
-   #--------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     T = fn.kinetic(x, n, a)
     V = fn.potential(x, n, a, f)
     S = T + V
@@ -198,10 +204,10 @@ iilm.write("{:.4f}\t{:.4f}\t{:.4f}\n".format(s0,stot_av/float(N_inst*s0),stot_er
 iilm.write('e_av, e_err, x_av, x_err, x2_av,x2_err, x4_av, x4_err\n')  
 iilm.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(e_av, e_err, x_av, x_err, x2_av, x2_err, x4_av, x4_err))
 #----------log derivatives------------------------------------------------------------|
-dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a, n_p)
-x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er, n_p) #substracting
-dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a, n_p)
-dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a, n_p)
+dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a)
+x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er) #substracting
+dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a)
+dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a)
 icor.write('tau\t   x(tau)\t    dx(tau)\t dlogx(tau)\n')
 icor2.write('tau\t   x^2(tau)\t    dx^2(tau)\t dlogx3(tau)\n')
 icor3.write('tau\t   x^3(tau)\t    dx^3(tau)\t dlogx3(tau)\n')
@@ -227,4 +233,3 @@ icor2.close()
 icor3.close()
 iconf.close()
 zdist.close()
-sia.close()
