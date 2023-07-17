@@ -381,7 +381,7 @@ def initialize_vacuum(n,f):
 def compute_energy(x,n, a ,f):
     '''
     return action, potential energy , kinetic energy\
-        virial term of configuration x
+        and virial term of configuration x
 
     Parameters
     ----------
@@ -714,6 +714,27 @@ def correlations_functions(x,n,n_p):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def correlations_functions_ipa(x,n,n_p):
+    '''
+    compute x(tau0)x(tau0+dtau) for random tau0 and different\
+        evaluation points and storage of tau0s in ipa[ic]
+
+    Parameters
+    ----------
+    x : array(float)
+        configuration.
+    n : int
+        lattice points in euclidean time direction.
+    n_p : int
+        number of evaluation point.
+
+    Returns
+    -------
+    xcor : array(float)
+        xcor[j] = <x[tau0]x[tau0+j]>
+    ip0 : array(int)
+        starting points of evaluation.
+
+    '''
     xcor = np.zeros(n_p)
     ip0  = int((n-n_p)*random.random()) #prendo 5 punti di partenza a caso tra x[o] e x[779]
     x0   = x[ip0] 
@@ -725,6 +746,27 @@ def correlations_functions_ipa(x,n,n_p):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def cool_correlations_functions(x, ip0, n, n_p):
+    '''
+    correlationfunctions for cooled configuration. The starting points\
+        for the evaluation are passe as parameters
+
+    Parameters
+    ----------
+    x : array(float)
+        configuration.
+    ip0 : array(int)
+        starting point for the evaluation.
+    n : int
+        lattice points.
+    n_p : int
+        number of evaluation points.
+
+    Returns
+    -------
+    xcor_cool : array(float)
+        correlation functions.
+
+    '''
     xcor_cool = np.zeros(n_p)
     x0_cool   = x[ip0] 
     for ip in range(n_p):
@@ -829,6 +871,29 @@ def histogramarray(x, xmin, st, m, hist):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
+    '''
+    construction of instanton distribution in the array iz 
+
+    Parameters
+    ----------
+    z : array(float)
+        instantons time location
+    nin : int
+        intanton + anti-instanton number.
+    tmax : float
+        higher bound on euclidean time.
+    stzhist : float
+        bin width.
+    nzhist : int
+        bin width.
+    iz : array(float)
+        histogram array for storage.
+
+    Returns
+    -------
+    None.
+
+    '''
     for ii in range(0, nin, 2):
         if ii == 0:
             zm =  -tmax
@@ -877,7 +942,31 @@ def building_wavefunction(hist, nxhist, stxhist, xhist_min):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def summing(n_alpha, dalpha, Va_av, Va_err):
+def summing(n_alpha, dalpha, e0, Va_av, Va_err):
+    '''
+    performing the integral over adiabatic coupling constant alpha 
+
+    Parameters
+    ----------
+    n_alpha : int
+        number of different values of alpha.
+    dalpha : float
+        alpha variation.
+    e0: float
+        energy of the reference syste (harmonic oscillator)
+    Va_av : array(float)
+        potential average V = alpha(V1-V0) for each alpha value.
+    Va_err : array (float)
+        errors associated to the potential averages .
+
+    Returns
+    -------
+    ei : float
+        free energy.
+    de_tot : float
+        error on free energy.
+
+    '''
     eup_sum     = 0.0
     eup_err     = 0.0
     eup_hal     = 0.0
@@ -903,11 +992,44 @@ def summing(n_alpha, dalpha, Va_av, Va_err):
         iap      = ia + n_alpha
         eup_hal += da * Va_av[ia]
         edw_hal += da * Va_av[iap]
-    return eup_sum, eup_err, eup_hal, edw_sum, edw_err, edw_hal
+    de     = eup_sum + edw_sum
+    ei     = e0 + de
+    de_err = np.sqrt(eup_err + edw_err)
+    de_hal = eup_hal + edw_hal
+    de_dif = abs(eup_sum - edw_sum)
+    de_dis = abs(de - de_hal)/2.0
+    de_tot = np.sqrt(de_err**2 + de_dif**2 + de_dis**2)
+    return ei, de_tot
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def instantons(f, a, n, x, xi, xa, z):
+def instantons(a, n, x, xi, xa, z):
+    '''
+    find instantons number and location in time
+
+    Parameters
+    ----------
+    a : float
+        lattice discretization.
+    n : int
+        lattice points.
+    x : array (float)
+        configuration.
+    xi : TYPE
+        DESCRIPTION.
+    xa : TYPE
+        DESCRIPTION.
+    z : array (float)
+        instantons locations.
+
+    Returns
+    -------
+    ni : int
+        instanton number.
+    na : int
+        anti-instanton number.
+
+    '''
     ni = 0
     na = 0
     nin= 0
@@ -938,7 +1060,7 @@ def find_instantons(x, dt):
     ----------
     x : ndarray
         Spatial configuration.
-    dt : ndarray
+    dt : float
         Euclidean time axis.
 
     Returns

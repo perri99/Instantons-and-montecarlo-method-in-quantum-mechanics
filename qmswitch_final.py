@@ -2,7 +2,10 @@ import numpy as np
 import functions as fn
 import random
 from tqdm import tqdm
-
+'''
+This programme runs in loop qmswitch.py in order to compute 6 values\
+    of the free enrgy for differetn values of temperature(inverse of euclidean time)
+'''
 
 def setting_inputs():
     f = 1.4 #minimum of the potential
@@ -118,16 +121,10 @@ for index in range(6):
        
     #----------------end of loops over coupling constant alpha---------------------|
     #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-    eup_sum, eup_err, eup_hal, edw_sum, edw_err, edw_hal = fn.summing(n_alpha, dalpha, Va_av, Va_err)
-    # -------------------------uncertainties --------------------------------------|                                                                        
-    de     = eup_sum + edw_sum
-    ei     = e0 + de
-    de_err = np.sqrt(eup_err + edw_err)
-    de_hal = eup_hal + edw_hal
-    de_dif = abs(eup_sum - edw_sum)
-    de_dis = abs(de - de_hal)/2.0
-    de_tot = np.sqrt(de_err**2 + de_dif**2 + de_dis**2)
+    ei, de_tot = fn.summing(n_alpha, dalpha, e0, Va_av, Va_err)
+                                                                            
+    
     #----------------outputs----------------------------------------------
-    energy.write('{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}{:.4f}\n'.format(1/beta, -ei, de_tot, de_err, de_dif, de_dis))
+    energy.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(1/beta, -ei, de_tot))
     print(-ei)
 energy.close()
