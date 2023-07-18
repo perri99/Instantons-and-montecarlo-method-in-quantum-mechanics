@@ -1,5 +1,5 @@
 # Instantons-and-montecarlo-method-in-quantum-mechanics
-The aim of this project is to implement montecarlo techniques in the study of a quantum mechanical problem. In this context we studied a non relativistic particle in a double well potential and tried to understand the role of tunneling events (instantons). The project is written in python with the implementation of numba JIT compiler in order to obtain a sensitive execution time speed up.
+The aim of this project is to implement montecarlo techniques in the study of a quantum mechanical problem. In this context we studied a non relativistic particle in a double well potential and tried to understand the role of tunneling events (instantons). The project is written in python with the implementation of numba JIT compiler in order to obtain a sensitive speed up of the execution time .
 
 ## Table of Contents 
  1. Requirements
@@ -55,7 +55,7 @@ The output datas of a given program are stored in .dat files in the directory 'D
      - `rilmgauss.py`
      -  `iilm.py`
      -   `streamline.py`
- 5. For the graphical analysis run  `plots.py`
+ 5. For a complete graphical analysis run  `plots.py`
 
 # Reference
 T. Schaefer, Instantons and Monte Carlo Methods in Quantum Mechanics, (2004) [hep-lat/0411010]
