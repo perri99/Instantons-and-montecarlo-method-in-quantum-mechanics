@@ -23,9 +23,9 @@ fn.directory('qmidens')
 density = open('Data/qmidens/density.dat', 'w')
 density.write('f\t dens_ng\t err\n')
 
-f = np.linspace(0.25, 1.75, num = 10)
+f = np.linspace(1.25, 1.75, num = 6)
 
-for loop in range(10):
+for loop in range(6):
     Vainst_av = np.zeros(2*n_alpha+1)
     Vainst_err = np.zeros(2*n_alpha+1)
     Vavac_av = np.zeros(2*n_alpha+1)
@@ -110,7 +110,7 @@ for loop in range(10):
         if ialpha % (2 * n_alpha) == 0:
             da = dalpha / 4.0
         else:
-            da = dalpha / 2.0   #chiedere informazioni
+            da = dalpha / 2.0   
         dsng = da * valphainst_av
         sng += dsng
         dsvacng = da * valphavac_av

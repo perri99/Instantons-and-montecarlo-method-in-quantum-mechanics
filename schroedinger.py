@@ -2,17 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import numba as nb
+import inputs
 '''
 Schroedinger resolver. It is imported as module in qmdiag.py
 '''
-
-def initialize_param():
-    x_min = -4.0
-    x_max = 4.0
-    minimum = 1.4
-    mass = 0.5
-    point_num = 1000
-    return x_min, x_max, minimum, mass, point_num
 
 
 @nb.jit(nopython = True)
@@ -164,7 +157,7 @@ def log_derivative(x,n, dt):
     return dx
 
 if __name__ == '__main__':
-    x_min, x_max, minimum, mass, point_num = initialize_param()
+    x_min, x_max, minimum, mass, point_num = inputs.schrodinger()
     Step = (x_max-x_min)/(point_num - 1)
     x = np.linspace(x_min, x_max, point_num)  #creation of a lattice 1d space
     V = anharmonic_potential(x, mass, minimum)

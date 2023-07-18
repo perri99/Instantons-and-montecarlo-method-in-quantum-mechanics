@@ -1,8 +1,31 @@
+#-------------------------------------------------------------------------
+#			INPUTS FILE
+#-------------------------------------------------------------------------
+
+please be sure this file is in the same directory of the programs
+
+#-------------------------------------------------------------------------
+#		SCHRODINGER SOLVER PARAMETERS
+#-------------------------------------------------------------------------
+Particle mass (please note that montecarlo simulations are performed for fixed mass of 0.5)
+mass 	= 0.5
+
+Number of discretized position points (space discretization)
+point_num = 1000
+
+x axis bounds
+x_min	= -4.0
+x_max   =  4.0
+
 Minimum of anharmonic oscillator potential (x^2 - f^2)^2
 f      = 1.4
 
 Unperturbed oscillator frequency (choose w0 ~ 4f)
 w0     = 5.6
+
+#-------------------------------------------------------------------------
+#                        MONTECARLO PARAMETERS
+#-------------------------------------------------------------------------
 
 Number of lattice points in the euclidean time direction (n ~ 800)
 n      = 800
@@ -48,13 +71,17 @@ nheat  = 10
 
 Position update dz 
 dz     = 1.0
-
+#--------------------------------------------------------------
+#          HARDCORE INTERACTION
+#--------------------------------------------------------------
 Hard core radius rcore  (0.3)
 tcore  = 0.3     
          
 Hard core strength A  (3.0)
 acore  = 3.0
-
+#--------------------------------------------------------------
+#          SEED
+#--------------------------------------------------------------
 Random seed
 seed   = 420
 

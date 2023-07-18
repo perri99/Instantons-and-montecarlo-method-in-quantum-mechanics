@@ -3,6 +3,7 @@ import schroedinger as sc
 from functions import directory
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import inputs
 '''
 This programme diagonalize the double well schroedinger equation and computes
 correlation functions, log derivatives of corr. functions and the free energy
@@ -19,7 +20,7 @@ write_dlog = open('Data/qmdiag/dlog.dat', 'w')
 partition_function = open('Data/qmdiag/partition_function.dat', 'w')
 #------------------------------------------------------------------------|
 #--------------------input parameters------------------------------------|
-x_min, x_max, minimum, mass, point_num = sc.initialize_param()
+x_min, x_max, minimum, mass, point_num = inputs.schrodinger()
 Step = (x_max-x_min)/(point_num - 1)
 #-------------------------------------------------------------------------
 #-------------------solving schroedinger----------------------------------

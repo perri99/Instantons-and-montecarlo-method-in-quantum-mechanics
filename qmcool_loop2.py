@@ -69,7 +69,7 @@ for loop in range(10):
         if i % kp2 == 0:
             ncoolconf += 1
             
-            ni, na     = fn.instantons(f[loop], a, n, xs, xi, xa, z)
+            ni, na     = fn.instantons(a, n, xs, xi, xa, z)
             Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
             nin = ni + na
             nin_sum[0]   += nin
@@ -79,7 +79,7 @@ for loop in range(10):
             for icool in range(1,ncool):                     
                xs = fn.cooling_update(xs, n, a, f[loop], dx)
                
-               ni, na     = fn.instantons(f[loop], a, n, xs, xi, xa, z)
+               ni, na     = fn.instantons( a, n, xs, xi, xa, z)
                Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
                nin = ni + na
                nin_sum[icool]   += nin

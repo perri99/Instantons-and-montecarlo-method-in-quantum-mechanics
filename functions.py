@@ -139,6 +139,10 @@ def V0(x,x0,w,vi,j):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def delta_V(x,x0,w,vi,f,a, n):
+    '''
+    delta_V = a*(V_anharmonic - V_harmonic)
+
+    '''
     delta_V = 0
     for j in range(n):
         delta_V += (x[j]**2-f**2)**2 - V0(x, x0, w, vi, j)
@@ -147,12 +151,23 @@ def delta_V(x,x0,w,vi,f,a, n):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_switch(x,n,a,w0,f,alpha):
+    '''
+    adiabatic coupled action\
+        S = kinetic + a*(alpha*(V1-V0)+V0)
+
+    
+
+    '''
     S_switch = kinetic(x, n, a) + potential_switch(x, n, a, f, w0, alpha)
     return S_switch
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def kinetic(x,n,a):
+    '''
+    total kinetic energy for configuration x
+
+    '''
     K = 0
     for j in range(n):
         K += (1/(4*a))*(x[j+1]-x[j])**2
@@ -160,13 +175,22 @@ def kinetic(x,n,a):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def kinetic_local(x,y,a): 
+def kinetic_local(x,y,a):
+    '''
+    local kinetic term involving only x and y points
+
+
+    '''
     K = (1/(4*a))*(x-y)**2
     return K
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_gauss(w,x,y,a):
+    '''
+    gaussian potential with weight w
+
+    '''
     return 0.5*w*a*(x-y)**2
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
@@ -177,11 +201,19 @@ def harmonic_potential(x,w0):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def action_switch_local(x, j, n, a, f, w0, alpha):
+    '''
+    local term of adiabatic coupled action
+
+    '''
     return (1/(4*a))*(x[j+1]-x[j])**2 + (1/(4*a))*(x[j]-x[j-1])**2 + a*(alpha*((x[j]**2-f**2)**2-harmonic_potential(x[j], w0)) + harmonic_potential(x[j], w0)) 
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential(x,n,a,f):
+    '''
+    double well potential for the configuration x. minimum placed at f
+
+    '''
     V = 0
     for j in range(n):
         if x is not None:
@@ -196,6 +228,10 @@ def potential_switch_local(x, j, n, a, f, w0, alpha):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_switch(x, n, a, f, w0, alpha):
+    '''
+    adiabatic coupled potential for the configuration x
+
+    '''
     V_switch = 0
     for j in range(n):
         V_switch += potential_switch_local(x, j, n, a, f, w0, alpha)
@@ -204,6 +240,10 @@ def potential_switch(x, n, a, f, w0, alpha):
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
 def potential_diff(x, n, a, f, w0):
+    '''
+    difference between double well potential and harmonic potential
+
+    '''
     V_diff = 0
     for j in range(n):
         V_diff += a*((x[j]**2-f**2)**2-harmonic_potential(x[j], w0))
@@ -308,9 +348,9 @@ def periodic_update(x,n,a,f,dx):
 
     '''
     for j in range(1,n):
-        S_old = action_localc(x[j], x[j-1], x[j+1], n, a, f)
+        S_old = action_local(x[j], x[j-1], x[j+1], n, a, f)
         xnew  = x[j] + dx*(2.0*random.random()-1.0)
-        S_new = action_localc(xnew, x[j-1], x[j+1], n, a, f)
+        S_new = action_local(xnew, x[j-1], x[j+1], n, a, f)
         delta_S = S_new-S_old
         delta_S = min(delta_S, 70.0)
         delta_S = max(delta_S, -70.0)
@@ -530,10 +570,10 @@ def cooling_update(xs,n,a,f,dx):
     nhit2 = 10  #number of updatig trials
     delxp= 0.1*dx
     for j in range(1,n):
-        Sold2 = action_localc(xs[j], xs[j-1], xs[j+1], n, a, f)
+        Sold2 = action_local(xs[j], xs[j-1], xs[j+1], n, a, f)
         for w in range(nhit2):                                
             xnew2 = xs[j] + delxp*(2.0*random.random()-1.0)
-            Snew2 = action_localc(xnew2, xs[j-1], xs[j+1], n, a, f)
+            Snew2 = action_local(xnew2, xs[j-1], xs[j+1], n, a, f)
             if Snew2 < Sold2:
                 xs[j] = xnew2
     return xs
@@ -590,7 +630,12 @@ def heating_update(x_hot, x, n, nheat, a, f, dx):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def action_localc(xj, xjm, xjp, n, a, f): #contribution to the action from the j-th point of configuration
+def action_local(xj, xjm, xjp, n, a, f): 
+    '''
+    contribution to the action from the j-th point of configuration
+
+    '''
+    
     return (1/(4*a))*(xj-xjm)**2 + a*(xj**2-f**2)**2 + (1/(4*a))*(xjp-xj)**2
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------

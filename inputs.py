@@ -1,4 +1,7 @@
-
+'''
+Functions that read the inputs from the file 'inputs.txt'\
+    and pass the values to the various programs
+'''
 
 def loading_inputs():
     '''
@@ -15,6 +18,21 @@ def loading_inputs():
             value = value.strip()  
             params[key] = float(value)  
     return params
+
+def schrodinger():
+    '''
+    setting inputs for the schroedinger resolver
+
+    '''
+    params = loading_inputs()
+    x_min = params['x_min']
+    x_max = params['x_max']
+    mass = params['mass']
+    point_num = int(params['point_num'])
+    minimum = params['f']
+    return x_min, x_max, minimum, mass, point_num
+    
+    
     
 def qm():
     '''
