@@ -65,3 +65,4 @@ The output datas of a given program are stored in .dat files in the directory 'D
 
 # 4.Reference
 T. Schaefer, Instantons and Monte Carlo Methods in Quantum Mechanics, (2004) [hep-lat/0411010]
+J. Izaac - J. Wang, Computational Quantum Mechanics, Springer (2018)
