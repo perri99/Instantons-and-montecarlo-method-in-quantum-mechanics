@@ -2,12 +2,14 @@
 The aim of this project is to implement montecarlo techniques in the study of a quantum mechanical problem. In this context we studied a non relativistic particle in a double well potential and tried to understand the role of tunneling events (instantons). The project is written in python with the implementation of numba JIT compiler in order to obtain a sensitive speed up of the execution time .
 
 ## Table of Contents 
+
  1. Requirements
  2. Structure
  3. Instructions
  4. Reference
 
 ## 1. Requirements
+
 Please be sure to have installed the following python packages before proceeding further:
   1. numpy
   2. random
@@ -15,7 +17,9 @@ Please be sure to have installed the following python packages before proceeding
   4. os
   5. numba
   6. matplotlib.pyplot
+     
 ## 2. Structure
+
 The project is made up of several files:
  - `inputs.txt`: in this file there are the inputs for all the programs of the project. Parameters are already set with recommended values ;
  - `inputs.py`: module containing functions that read the input parameters from `inputs.txt` and pass them to the programs;
@@ -38,7 +42,9 @@ This program only evaluate the value of the free energy for a fixed  tmperature 
  - `plots.py`: graphical analysis of data coming from the previous programs
 
 The output datas of a given program are stored in .dat files in the directory 'Data/program_name'. The directory of a programme is created the first time the programme is runned. Also the plots are saved in such directories in .pdf and .png format.
-# Instructions
+
+# 3.Instructions
+
 1. Install the required python packages
 2. Download all files of this repository and place them in the same folder
 3. Set input parameters in the file `inputs.txt` (recommended values are already set)
@@ -57,5 +63,5 @@ The output datas of a given program are stored in .dat files in the directory 'D
      -   `streamline.py`
  5. For a complete graphical analysis run  `plots.py`
 
-# Reference
+# 4.Reference
 T. Schaefer, Instantons and Monte Carlo Methods in Quantum Mechanics, (2004) [hep-lat/0411010]
