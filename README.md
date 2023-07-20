@@ -46,7 +46,7 @@ The output datas of a given program are stored in .dat files in the directory 'D
 # 3.Instructions
 
 1. Install the required python packages
-2. Download all files of this repository and place them in the same folder
+2. Download all files in 'codes' and place them in the same folder
 3. Set input parameters in the file `inputs.txt` (recommended values are already set)
 4. Run the programmes:
      -  `qmdiag.py`
