@@ -201,10 +201,10 @@ averages.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format
 averages.write('e_av, e_err, x_av, x_err, x2_av,x2_err, x4_av, x4_err\n')  
 averages.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(e_av, e_err, x_av, x_err, x2_av, x2_err, x4_av, x4_err))
 #----------log derivatives------------------------------------------------------------|
-dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a, n_p)
-x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er, n_p) #substracting
-dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a, n_p)
-dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a, n_p)
+dx, dxe = fn.log_derivatives(xcor_av, xcor_er, a)
+x2sub_av, x2sub_er = fn.substract(x2cor_av, x2cor_er) #substracting
+dx2, dxe2 = fn.log_derivatives(x2sub_av, x2sub_er, a)
+dx3, dxe3 = fn.log_derivatives(x3cor_av, x3cor_er, a)
 correlations.write('tau\t   x(tau)\t    dx(tau)\t dlogx(tau)\n')
 correlations2.write('tau\t   x^2(tau)\t    dx^2(tau)\t dlogx3(tau)\n')
 correlations3.write('tau\t   x^3(tau)\t    dx^3(tau)\t dlogx3(tau)\n')

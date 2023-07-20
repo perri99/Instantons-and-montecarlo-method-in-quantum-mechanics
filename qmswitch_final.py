@@ -9,7 +9,7 @@ This programme runs in loop qmswitch.py in order to compute 6 values\
 '''
 
 #--------------------------setting inputs------------------------------------
-n, f, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = inputs.qmswitch()
+f, n, a, neq, nmc, dx, n_alpha, nc, kp, mode, seed, w0 = inputs.qmswitch()
 random.seed(seed)
 #--------------------------output files--------------------------------------
 fn.directory('qmswitch')

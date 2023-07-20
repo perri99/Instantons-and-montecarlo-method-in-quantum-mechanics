@@ -7,6 +7,23 @@ import inputs
 Montecarlo implementation with cooling procedures. This programme computes \
     the same things of qm.py but with cooled configuration. Analysis\
         of instanton content is carried out
+Input:
+------------------------------------------------------------------------------
+   f       minimum of harmonic oxillator: (x^2-f^2)^2
+   n       number of lattice points in the euclidean time direction (n=800)
+   a       lattice spacing (a=0.05)
+   neq     number of equilibration sweeps
+   nmc     number of Monte Carlo sweeps (nmc=10^5)
+   dx      gaussian update width
+   n_p      number of points on which the correlation functions are measured: 
+           <x_i x_(i+1)>,...,<x_i x_(i+np)> (np=20)
+   nc      number of correlator measurements in a single configuration (nc=5)                               
+   kp      number of sweeps between writeout of complete configuration 
+   mode    0 = cold start, otherwise hot start
+   seed    seed for random generations
+   kp2     number of montecarlo sweeps between cooling procedure
+   ncool   number of cooling sweeps
+-------------------------------------------------------------------------------
 Relevant outputs:
     1. correlation functions and their log derivatives for cooled configuration
     2. instanton density as function of cooling sweeps
@@ -67,10 +84,10 @@ correlations3.write("x3 correlation function\n")
 correlations3_cool = open('Data/qmcool/correlations3_cool.dat', 'w')
 correlations3_cool.write("x3 correlation function (cool)\n ip*a, x3cool_av[ip], x3cool_er[ip], dx, dxe\n")
 #-------counter variables-------------------------------------------|
-nconf = 0 #it counts the number of randomly generated configurations 
-ncor = 0 #it counts the number of correlations taken
-ncoolconf = 0
-ncoolcor  = 0
+nconf = 0        #it counts the number of randomly generated configurations 
+ncor = 0         #it counts the number of correlations taken
+ncoolconf = 0    #it counts the number of cooled configurations
+ncoolcor  = 0    #it counts the number of  cooled correlations taken
 #-------histogram parameters----------------------------------------|
 nzhist = 40
 stzhist = 4.0 / float(nzhist)
@@ -103,14 +120,11 @@ x2cor_er   = np.zeros(n_p)
 x3cor_er   = np.zeros(n_p)
 ipa        = np.zeros(nc)
 xs         = np.zeros(n+1)
-z = np.zeros(n)
 nin_sum    = np.zeros(ncool+1)
 nin2_sum   = np.zeros(ncool+1)
 scool_sum  = np.zeros(ncool+1)
 scool2_sum = np.zeros(ncool+1)
 iz         = np.zeros(nzhist)
-xi         = np.zeros(n)
-xa         = np.zeros(n)
 nin_av      = np.zeros(ncool+1)
 nin_er      = np.zeros(ncool+1)
 scool_av    = np.zeros(ncool+1)
@@ -132,7 +146,6 @@ x3cool_er   = np.zeros(n_p)
 
 #starting configuration-----------------------------------------|
 x = fn.periodic_starting_conf(n, f, mode)
-
 #---------montecarlo generations--------------------------------|
 for i in tqdm(range(nmc)):
     nconf += 1
@@ -187,8 +200,7 @@ for i in tqdm(range(nmc)):
          x2_sum += x[k]**2
          x4_sum += x[k]**4
          x8_sum += x[k]**8
-    #computation of action, kinetic energy, potential and virial for the current configuration
-    ipa = np.zeros(nc)
+    ipa = np.zeros(nc)   #here will be stored initial evaluation points of correlations
     for ic in range(nc):
         ncor += 1 
         xcor, ipa[ic] = fn.correlations_functions_ipa(x, n, n_p)
@@ -208,7 +220,7 @@ for i in tqdm(range(nmc)):
     if i % kp2 == 0:
         ncoolconf += 1
         
-        ni, na     = fn.instantons(a, n, xs, xi, xa, z)
+        ni, na, z     = fn.instantons(a, n, xs)
         Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f)
         nin = ni + na
         nin_sum[0]   += nin
@@ -218,7 +230,7 @@ for i in tqdm(range(nmc)):
         for icool in range(1,ncool+1):                     
            xs = fn.cooling_update(xs, n, a, f, dx)
            
-           ni, na     = fn.instantons( a, n, xs, xi, xa, z)
+           ni, na, z     = fn.instantons(a, n, xs)
            Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f)
            nin = ni + na
            nin_sum[icool]   += nin
@@ -267,7 +279,7 @@ for ic in range(ncool+1):
     nin_av[ic], nin_er[ic] = fn.dispersion(ncoolconf, nin_sum[ic]  , nin2_sum[ic]) 
     scool_av[ic], scool_er[ic] = fn.dispersion(ncoolconf, scool_sum[ic], scool2_sum[ic]) 
 
-#continuum averages   
+#densities averages   
 v_av   = vtot_av/tmax
 v_err  = vtot_err/tmax
 t_av   = ttot_av/tmax

@@ -11,7 +11,7 @@ Particle mass (please note that montecarlo simulations are performed for fixed m
 mass 	= 0.5
 
 Number of discretized position points (space discretization)
-point_num = 1000
+point_num = 800
 
 x axis bounds
 x_min	= -4.0
@@ -34,7 +34,7 @@ Lattice spacing (a ∼ 0.05)
 a      = 0.05
 
 Choose 0 (cold start), choose 1 (hot start)
-mode  = 1
+mode  = 0
 
 Number of equilibration sweeps before first measurement (neq ∼ 100)
 neq    = 100

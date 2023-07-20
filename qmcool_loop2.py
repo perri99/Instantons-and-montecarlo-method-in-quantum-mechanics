@@ -30,14 +30,12 @@ for loop in range(10):
     #-------histogram parameters----------------------------------------|
     nzhist = 40
     stzhist = 4.01 / float(nzhist)
-    z = np.zeros(n)
+    
     nin_sum    = np.zeros(ncool+1)
     nin2_sum   = np.zeros(ncool+1)
     scool_sum  = np.zeros(ncool+1)
     scool2_sum = np.zeros(ncool+1)
-    iz         = np.zeros(nzhist)
-    xi         = np.zeros(n)
-    xa         = np.zeros(n)
+    
     nin_av      = np.zeros(ncool+1)
     nin_er      = np.zeros(ncool+1)
     scool_av    = np.zeros(ncool+1)
@@ -69,7 +67,7 @@ for loop in range(10):
         if i % kp2 == 0:
             ncoolconf += 1
             
-            ni, na     = fn.instantons(a, n, xs, xi, xa, z)
+            ni, na, z     = fn.instantons(a, n, xs)
             Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
             nin = ni + na
             nin_sum[0]   += nin
@@ -79,17 +77,14 @@ for loop in range(10):
             for icool in range(1,ncool):                     
                xs = fn.cooling_update(xs, n, a, f[loop], dx)
                
-               ni, na     = fn.instantons( a, n, xs, xi, xa, z)
+               ni, na, z     = fn.instantons(a, n, xs)
                Sc, Vc, Tc, TVc = fn.compute_energy(xs, n, a, f[loop])
                nin = ni + na
                nin_sum[icool]   += nin
                nin2_sum[icool]  += nin**2
                scool_sum[icool] += Sc
                scool2_sum[icool]+= Sc**2
-            #--------------cooled configuration: instanton distribution  -------------|                          
-            fn.instanton_distribution(z, nin, tmax, stzhist, nzhist, iz)
-    #   instanton density                                      
-    #------------------------------------------------------------------------------
+            
     for ic in range(ncool):
         nin_av[ic], nin_er[ic] = fn.dispersion(ncoolconf, nin_sum[ic]  , nin2_sum[ic])
     instdensity.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f[loop], nin_av[9],  nin_er[9]))

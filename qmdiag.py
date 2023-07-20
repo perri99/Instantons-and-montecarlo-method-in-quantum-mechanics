@@ -67,13 +67,13 @@ dlog = (xlogmax-xlogmin)/float(nl)
 partition_function.write("T\t beta\t F\n")
 for il in range(nl+1):
     xlog = xlogmin+il*dlog
-    xl = np.exp(xlog) #questo è il tempo euclideo
-    t  = 1.0/xl #quetsa è la temperatura(inverso del tempo euclideo)
-    z  = 1.0
+    beta = np.exp(xlog)              #euclidean time
+    t  = 1.0/beta                    #temperature(1 / euclidean time)
+    partitionFunction  = 1.0
     for i in range(1, point_num):
-        z += np.exp(-(EigValues[i]-EigValues[0])*xl) #partition function
-    p = t*np.log(z) - EigValues[0]                   #free energy
-    partition_function.write("{:.4f}\t{:.4f}\t{:.4f}\n".format(t, xl, p))
+        partitionFunction += np.exp(-(EigValues[i]-EigValues[0])*beta) #partition function
+    free_energy = t*np.log(partitionFunction) - EigValues[0]                   #free energy
+    partition_function.write("{:.4f}\t{:.4f}\t{:.4f}\n".format(t, beta, free_energy))
 #------------------------------------------------------------------------------|
 #------------writing wavefunction of ground state and eigenvalues--------------|
 write_eigenvalues.write('State |n> '+' Eigenvalue\n')
@@ -84,7 +84,7 @@ write_groundstate.write('x '+'psi_0(x)\n')
 for j in range(point_num):
     write_groundstate.write("{:.4f}\t{:.4f}\n".format(x[j], ground_state[j]))
 
-plt.plot(x, ground_state, label = 'groundstate')
+plt.plot(x, ground_state**2, label = 'groundstate squared')
 plt.xlabel('x')
 plt.ylabel('Psi0(x)')
 plt.legend()

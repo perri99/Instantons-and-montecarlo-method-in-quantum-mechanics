@@ -36,9 +36,6 @@ for loop in range(3):
     nin2_sum   = np.zeros(ncool+1)
     scool_sum  = np.zeros(ncool+1)
     scool2_sum = np.zeros(ncool+1)
-    iz         = np.zeros(nzhist)
-    xi         = np.zeros(n)
-    xa         = np.zeros(n)
     nin_av      = np.zeros(ncool+1)
     nin_er      = np.zeros(ncool+1)
     scool_av    = np.zeros(ncool+1)
@@ -57,9 +54,7 @@ for loop in range(3):
             nin2_sum   = np.zeros(ncool+1)
             scool_sum  = np.zeros(ncool+1)
             scool2_sum = np.zeros(ncool+1)
-            iz         = np.zeros(nzhist)
-            xi         = np.zeros(n)
-            xa         = np.zeros(n)
+            
             nin_av      = np.zeros(ncool+1)
             nin_er      = np.zeros(ncool+1)
             scool_av    = np.zeros(ncool+1)
@@ -70,9 +65,10 @@ for loop in range(3):
         if i % kp2 == 0:
             ncoolconf += 1
             Sc = fn.action(xs, n, a, f[loop])
-            ni, na, c, b     = fn.find_instantons(xs, a)
+            ni, na, z     = fn.instantons(a, n, xs)
             
             nin = ni + na
+            
             nin_sum[0]   += nin
             nin2_sum[0]  += nin**2
             scool_sum[0] += Sc
@@ -80,7 +76,7 @@ for loop in range(3):
             for icool in range(1,ncool+1):                     
                xs = fn.cooling_update(xs, n, a, f[loop], dx)
                Sc = fn.action(xs, n, a, f[loop])
-               ni, na, c, b     = fn.find_instantons(xs, a)
+               ni, na, z     = fn.instantons(a, n, xs)
                
                nin = ni + na
                nin_sum[icool]   += nin

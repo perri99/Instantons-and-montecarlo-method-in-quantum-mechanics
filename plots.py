@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import re
+
 
 n = 800
 a = 0.05
@@ -524,7 +524,7 @@ plt.title('Instanton density')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlim(1, )
-plt.legend()
+plt.legend(loc = 'upper right')
 plt.savefig('Data/qmcool/instdensity.pdf')
 plt.savefig('Data/qmcool/instdensity.png')
 plt.show()

@@ -27,7 +27,7 @@ Output:
                 for O=x,x^2,x^3;results are given in the format: tau, Pi(tau),
                      DeltaPi(tau), dlog(Pi)/dtau, Delta[dlog(Pi)/dtau],where 
                          DeltaPi(tau) is the statistical error in Pi(tau)
-    iz          Instanton distribution
+    iz          Instanton separation distribution
 '''
 #-------------Setting inputs---------------------------------------------------
 f, n, a, N_inst, neq, nmc, dx, n_p, nc, kp, seed = inputs.rilm()

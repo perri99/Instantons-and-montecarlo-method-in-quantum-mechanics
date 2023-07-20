@@ -34,7 +34,7 @@ def anharmonic_potential(x, mass, minimum):
 @nb.jit(nopython = True)
 def normalization(x,dx):
     '''
-    returns an array normalized to one
+    returns the array x normalized to one
     Parameters:
            x: array-like
            dx: floating type

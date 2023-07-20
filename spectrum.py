@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import schroedinger as sc
 from functions import directory
 from tqdm import tqdm
+import inputs
 '''
 This programme computes the spectrum of the double well potential\
     in function of different values of double well separation f
@@ -14,7 +15,7 @@ directory('qmdiag')
 split = open('Data/qmdiag/splitting.dat', 'w')
 #------------------------------------------------------------------------------|
 #-----------spectrum with different f------------------------------------------|
-x_min, x_max, minimum, mass, point_num = sc.initialize_param()
+x_min, x_max, minimum, mass, point_num = inputs.schrodinger()
 Step = (x_max-x_min)/(point_num - 1)
 x = np.linspace(x_min, x_max, point_num)
 f = np.linspace(0,3,50)

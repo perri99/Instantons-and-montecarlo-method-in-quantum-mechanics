@@ -1,20 +1,23 @@
 import numpy as np
 from tqdm import tqdm
-import random
 import functions as fn
 import matplotlib.pyplot as plt
 import inputs
+'''
+Solving streamline equation and comparison with sum ansatz model and\
+    hardcore interactive model
+'''
 
 #-----------setting inputs--------------------------------------------------
 f, n, a, neq, nmc, dx, n_p, nc, kp, N_inst, tcore, score, dz, seed = inputs.iilm()
-#random.seed(seed)
+
 #'''----------Definitions-------------------------------------------------------'''
 tcore = tcore/f
 tmax  = n*a
 s0    = 4.0/3.0*f**3
 score = score*s0
 x = np.zeros(n+1)
-#   plot S_IA                                                              
+                                                           
 #------------------------------------------------------------------------------
 fn.directory('streamline')
 sum_ansatz = open('Data/streamline/sum_ansatz.dat', 'w')
@@ -36,11 +39,10 @@ for na in range(ni, ni*2):
     s -= 2
     tau_ia_ansatz[na - ni] = z[1] - z[0] 
     sum_ansatz.write('{:.2f}\t{:.4f}\n'.format(tau_ia_ansatz[na-ni], s))
-    #sia.write('{:.4f}\t{:.4f}\n'.format((na-ni)*a, S/s0-2.0))
 sum_ansatz.close()
 
 #------------sum ansatz zero crossing-----------------------------------------------------
-tau_ia_zcr, action_int_zcr = fn.zero_crossing(x)
+tau_ia_zcr, action_int_zcr = fn.zero_crossing_sum_ansatz(x)
 for k in range(len(tau_ia_zcr)):
     zero_crossing.write('{}\t{}\n'.format(tau_ia_zcr[k], action_int_zcr[k]))
 zero_crossing.close()
@@ -57,7 +59,8 @@ for na in range(ni, ni*2):
     sia.write('{:.4f}\t{:.4f}\n'.format((na-ni)*a, S/s0-2.0))
 sia.close()
 #------------stream line--------------------------------------------------------
-fn.streamline_equation(50, 1.8, 70001, 0.05)
+fn.streamline_equation(n_lattice_half = 50, r_initial_sep= 1.8,n_streamline= 70001)
+#---------------------------------------------------------------------------------
 #------------plotting------------------------------------------------------------
 with open('Data/streamline/sum_ansatz.dat', 'r') as file:
     lines = file.readlines()
@@ -92,7 +95,7 @@ y     = np.array(column2)
 
 plt.errorbar(x, y, fmt='s', markeredgecolor = 'blue',  label= 'sum ansatz zero crossing')
 
-with open('Data/streamline/zero_crossing.dat', 'r') as file:
+with open('Data/streamline/streamline.dat', 'r') as file:
     lines = file.readlines()
 
 column1 = [float(line.split()[0]) for line in lines]
@@ -103,16 +106,6 @@ y     = np.array(column2)
 
 plt.errorbar(x, y,color = 'black', linestyle = '--', label= 'streamline')
 
-with open('Data/zero cross cooling/zia.dat', 'r') as file:
-    lines = file.readlines()
-
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-
-x     = np.array(column1)
-y     = np.array(column2)
-
-plt.errorbar(x, y, fmt='o', markeredgecolor = 'red',  label= 'cooling montecarlo')
 
 plt.xlim(0,2)
 plt.ylim(-2,1.1)
@@ -140,6 +133,7 @@ for fil in tqdm(files):
     plt.plot(x-2.5, y, color = 'black', linewidth = 0.5, label= 'sum ansatz')
 plt.xlabel('t')
 plt.ylabel('x(t)')
+plt.xlim(-2,2)
 plt.savefig('Data/streamline/config.pdf')
 plt.savefig('Data/streamline/config.png')
 plt.show()
@@ -161,6 +155,8 @@ for fil in tqdm(files):
     plt.plot(x-2.5, y, color = 'black',linewidth = 0.5,)
 plt.xlabel('t')
 plt.ylabel('s(t)')
+plt.xlim(-2,2)
+plt.ylim(0, 8)
 plt.savefig('Data/streamline/densaction.pdf')
 plt.savefig('Data/streamline/densaction.png')
 plt.show()
