@@ -106,11 +106,10 @@ for index in range(6):
         ei += de
        
     #----------------end of loops over coupling constant alpha---------------------|
-    #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-    ei, de_tot = fn.summing(n_alpha, dalpha, Va_av, Va_err, e0)
+    #----------------integrating over alpha---------------------------.------------|
+    free_energy, free_energy_error = fn.summing(n_alpha, dalpha, Va_av, Va_err, e0)
                                                                             
     
     #----------------outputs----------------------------------------------
-    energy.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(1/beta, -ei, de_tot))
-    print(-ei)
+    energy.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(1/beta, -free_energy, free_energy_error))
 energy.close()

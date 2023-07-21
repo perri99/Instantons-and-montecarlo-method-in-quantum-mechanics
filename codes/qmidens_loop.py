@@ -44,7 +44,7 @@ for loop in range(6):
     dalpha = 1.0/float(n_alpha)
     beta   = n*a
     tau0   = beta/2.0
-    s0   = 4.0/3.0*f[loop]**3     #classical action for instanton solution
+    s0   = 4.0/3.0*f[loop]**3                               #classical action for instanton solution
     dens = 8*np.sqrt(2.0/pi) * f[loop]**2.5 * np.exp(-s0)   #1-loop tunneling rate
     f0   = dens
     #------initialize instanton and gaussian potential-----------------------------|
@@ -107,31 +107,18 @@ for loop in range(6):
         Vavac_av[ialpha]  = valphavac_av
         Vavac_err[ialpha] = valphavac_err
             
-        if ialpha % (2 * n_alpha) == 0:
-            da = dalpha / 4.0
-        else:
-            da = dalpha / 2.0   
-        dsng = da * valphainst_av
-        sng += dsng
-        dsvacng = da * valphavac_av
-        svacng += dsvacng
     #----------------end of loops over coupling constant alpha---------------------|
-    #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-    sng, ds_tot = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
-    svacng, dsvac_tot = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
+    #-----------------------integrating over alpha---------------------------------|
+    nongaussian_instanton_action, nongaussian_inst_action_error = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
+    nongaussian_vacuum_action, nongaussian_vac_action_error = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
 
-    dens_ng = dens*np.exp(-sng)
-    dens_er = dens_ng*ds_tot 
-
-    fvac      = np.exp(-svacng)
-    fvac_er   = fvac*dsvac_tot 
-    # final answer                                                                          
-    #------------------------------------------------------------------------------
-    seff    = sng - svacng
-    seff_er = np.sqrt(ds_tot**2+dsvac_tot**2)
-    dens_ng = dens*np.exp(-seff)
-    dens_er = dens_ng*seff_er
-    density.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f[loop], dens_ng, dens_er))
+    effective_action    = nongaussian_instanton_action - nongaussian_vacuum_action
+    effective_action_error = np.sqrt(nongaussian_inst_action_error**2+nongaussian_vac_action_error**2)
+    
+    nongaussian_density = dens*np.exp(-effective_action)
+    nongaussian_density_error = nongaussian_density*effective_action_error
+    
+    density.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f[loop], nongaussian_density, nongaussian_density_error))
 
 density.close()
     

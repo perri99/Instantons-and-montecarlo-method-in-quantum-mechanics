@@ -115,9 +115,9 @@ for ialpha in tqdm(range(2 * n_alpha)):
     switch.write('ei\t de\t e0\n')
     switch.write("{:.4f}\t{:.4f}\t{:.4f}\n\n".format( ei, de, e0))
 #----------------end of loops over coupling constant alpha---------------------|
-#------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
-ei, de_tot = fn.summing(n_alpha, dalpha,e0, Va_av, Va_err)
-# -------------------------uncertainties --------------------------------------|                                                                        
+#----------------integrating over alpha---------------------------.------------|
+free_energy, free_energy_error = fn.summing(n_alpha, dalpha,e0, Va_av, Va_err)
+                                                                  
 
 #outputs
 switch.write('input parameters\n -----------\n')
@@ -126,7 +126,7 @@ switch.write("{:.4f}\t{:.4f}\t{:.4f}\n\n".format( beta, f0, e0))
 switch.write('final initial energy\n ei\t de\t e0\n')
 switch.write("{:.4f}\t{:.4f}\t{:.4f}\n\n".format( ei, de, e0))
 switch.write(' ei\t de_tot\t \n')
-switch.write("{:.4f}\t{:.4f}\n".format( ei, de_tot))
+switch.write("{:.4f}\t{:.4f}\n".format( free_energy, free_energy_error))
 switch.close()
 
 

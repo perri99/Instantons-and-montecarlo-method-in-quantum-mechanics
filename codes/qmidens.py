@@ -25,8 +25,8 @@ pi     = np.pi
 dalpha = 1.0/float(n_alpha)
 beta   = n*a
 tau0   = beta/2.0
-s0   = 4.0/3.0*f**3     #classical action for instanton solution
-dens = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0)   #unperturbed tunneling rate
+s0   = 4.0/3.0*f**3                           #classical action for instanton solution
+dens = 8*np.sqrt(2.0/pi)*f**2.5*np.exp(-s0)   #classical tunneling rate
 f0   = dens
 #---------opening files--------------------------------------------------------|
 fn.directory('qmidens')
@@ -179,31 +179,33 @@ for ialpha in tqdm(range((2 * n_alpha + 1))):
 #----------------end of loops over coupling constant alpha---------------------|
 #------have sum=1/2(up+down) and up = 1/2*f0+f1+...+1/2*fn, down=..------------|
 
-sng, ds_tot = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
-svacng, dsvac_tot = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
+nongaussian_instanton_action, nongaussian_inst_action_error = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
+nongaussian_vacuum_action, nongaussian_vac_action_error = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
 
-dens_ng= dens*np.exp(-sng)
-dens_er= dens_ng*ds_tot 
+dens_ng= dens*np.exp(-nongaussian_instanton_action)
+dens_er= dens_ng*nongaussian_inst_action_error 
 
 fvac      = np.exp(-svacng)
-fvac_er   = fvac*dsvac_tot 
+fvac_er   = fvac*nongaussian_vac_action_error 
 #------------------------------------------------------------------------------
 # output                                                                         
 qmidens.write('sng\t ds_tot\t ds_err\t ds_dif\t ds_dis\t svacng\n')
-qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n\n".format(sng, ds_tot, svacng, dsvac_tot))
+qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n\n".format(nongaussian_instanton_action, nongaussian_inst_action_error,\
+                                                           nongaussian_vacuum_action, nongaussian_vac_action_error))
 qmidens.write('fvac\t fvac_err\n')
 qmidens.write("{:.4f}\t{:.4f}\n\n".format(fvac, fvac_er))
 # final answer                                                                          
 #------------------------------------------------------------------------------
-seff    = sng - svacng
-seff_er = np.sqrt(ds_tot**2+dsvac_tot**2)
-dens_ng = dens*np.exp(-seff)
-dens_er = dens_ng*seff_er
+effective_action    = nongaussian_instanton_action - nongaussian_vacuum_action
+effective_action_error = np.sqrt(nongaussian_inst_action_error**2+nongaussian_vac_action_error**2)
+nongaussian_density = dens*np.exp(-effective_action)
+nongaussian_density_error = nongaussian_density*effective_action_error
 #------------------------------------------------------------------------------
 #   output                                                                         
 #------------------------------------------------------------------------------
 qmidens.write('seff\t, sng\t svacng\t seff\t seff_er\n')
-qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(seff, sng, svacng, seff, seff_er))
+qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(effective_action, nongaussian_instanton_action,\
+                                                                nongaussian_vacuum_action, effective_action, effective_action_error))
 qmidens.write('dens_ng\t dens\t dens_ng\t dens_er\n')
 qmidens.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}".format(dens_ng, dens, dens_ng, dens_er))
 
