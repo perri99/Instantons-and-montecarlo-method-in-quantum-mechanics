@@ -1082,58 +1082,7 @@ plt.ylabel('dlog<x^n(0)x^n(τ)>')
 plt.savefig('Data/rilmgauss/dlog_gauss.pdf')
 plt.savefig('Data/rilmgauss/dlog_gauss.png')
 plt.show()
-#------------------------------------------------------------------------------
-#   Fig.16 Distribution of instanton-anti-instanton separations
-#------------------------------------------------------------------------------
-with open('Data/rilm/hist_z_rilm.dat', 'r') as file:
-    lines = file.readlines()[1:]
 
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-
-x     = np.array(column1)
-y     = np.array(column2)
-
-plt.plot(x, y, color = 'red', label= 'random sum ansatz')
-
-with open('Data/iilm/zdist.dat', 'r') as file:
-    lines = file.readlines()[1:]
-
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-
-x     = np.array(column1)
-y     = np.array(column2) 
-
-plt.plot(x, y, color = 'black', drawstyle = 'steps', label = 'interactive ensemble')
-
-with open('Data/qmcool/hist_z.dat', 'r') as file:
-    lines = file.readlines()[3:]
-
-column1 = [float(line.split()[0]) for line in lines]
-column2 = [float(line.split()[1]) for line in lines]
-
-x     = np.array(column1)
-y     = np.array(column2) 
-
-plt.plot(x, y, color = 'green', drawstyle = 'steps', label = 'cooling montecarlo')
-
-zcr = np.loadtxt('C:/Users/perri/OneDrive/Desktop/instantons-main/output_data/output_cooled_monte_carlo/zero_crossing/zcr_cooling.txt', float,
-                 delimiter=' ')
-
-plt.hist(zcr, 40, (0., 4.), 
-        label='Monte carlo cooling', histtype='step',
-        color='blue', linewidth=1.8)
-
-plt.xlabel('τ_z')
-plt.ylabel('n_IA(τ_z)')
-plt.title('Istanton-anti-istanton separation distribution')
-plt.xlim(0,3.85)
-plt.ylim(0,50000)
-plt.legend()
-plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.pdf')
-plt.savefig('Data/iilm/Istanton-anti-istanton separation distribution.png')
-plt.show()
 #-----------------------------------------------------------------------------
 #   Fig.17 Typical instanton configuration in an instanton calculation
 #------------------------------------------------------------------------------
