@@ -287,7 +287,7 @@ def hardcore_interaction(z, nin, tcore, score, tmax, s0):
     hardcore_action = 0.0
     if tcore == 0:
         return hardcore_action 
-    for i in range(nin):
+    for i in range(1, nin):
         if i == 0:
             zm = z[-1] - tmax
         else:
