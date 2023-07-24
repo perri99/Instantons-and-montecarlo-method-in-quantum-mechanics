@@ -51,7 +51,7 @@ for i in tqdm(range(ntau+1)):
 #------------log derivative of <x^n(0)x^n(t)>--------------------------------------|
 sub = np.full(ntau+1, -x2cor[ntau]) #need for substract constant terms in x^2 propagator
 dlog = sc.log_derivative(xcor, ntau, dtau)
-dlog2 = sc.log_derivative(np.add(x2cor,sub), ntau, dtau)
+dlog2 = sc.log_derivative(np.add(x2cor, sub), ntau, dtau)
 dlog3 = sc.log_derivative(x3cor, ntau, dtau)
 for i in range(ntau):
     tau = i * dtau
@@ -95,7 +95,7 @@ plt.show()
 #------------plotting----------------------------------------------------------|
 plt.plot(x,V)
 for i in range(4):
-    plt.plot(x, EigVectors[:,i]**2 + EigValues[i], label = 'state '+str(i))
+    plt.plot(x, EigVectors[:,i] + EigValues[i], label = 'state '+str(i))
 plt.title('First 3 eigenvectors squared')
 plt.xlabel('x')
 plt.ylabel('Psi(x)')

@@ -57,7 +57,8 @@ fn.directory('iilm')
         
 iilm = open('Data/iilm/iilm.dat', 'w')
 iilm.write('qm iilm\n n\t a\t f\n'+'{}\t{:.4f}\t{:.4f}\n'.format(n, a, f))
-iilm.write('N_inst\t nmc\t neq\t n_p\t nc\n'+'{}\t{}\t{}\t{}\t{}\n'.format(N_inst, nmc, neq, n_p, nc))
+iilm.write('N_inst\t nmc\t neq\t n_p\t nc\n'+'{}\t{}\t{}\t{}\t{}\n'.format(N_inst,\
+                                                                           nmc, neq, n_p, nc))
 iilm.write('dz\t tcore\t score\n'+'{:.4f}\t{:.4f}\t{:.4f}\n\n'.format(dz, tcore, score))
 config_iilm = open('Data/iilm/config_iilm.dat', 'w')
 trajectory_iilm = open('Data/iilm/trajectory_iilm.dat', 'w')
@@ -139,12 +140,16 @@ for i in tqdm(range(nmc)):
         x3cor_sum  = np.zeros(n_p)
         x3cor2_sum = np.zeros(n_p)
         iz         = np.zeros(nzhist)
-    z, x = fn.update_interacting_instanton(N_inst, z, tmax, tcore, score, dz, x, n, a, f, s0)
+    z, x = fn.update_interacting_instanton(N_inst, z, tmax, tcore, score,\
+                                           dz, x, n, a, f, s0)
     if i > 100 and i < 3000 :
         for ipr in range(min(10,len(z))):
             iconf.write(f'{z[ipr]:.4f}\t')
         iconf.write('\n')
-    fn.instanton_distribution(z, N_inst, tmax, stzhist, nzhist, iz)
+        
+    zero_crossing_histogram = \
+        fn.instanton_distribution(z, N_inst, tmax, nzhist)
+    iz = np.add(iz, zero_crossing_histogram)
     #   action etc.                                                            
     #--------------------------------------------------------------------------
     T = fn.kinetic(x, n, a)

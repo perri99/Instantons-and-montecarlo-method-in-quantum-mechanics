@@ -92,7 +92,7 @@ x3cor_av   = np.zeros(n_p)
 xcor_er    = np.zeros(n_p)
 x2cor_er   = np.zeros(n_p)
 x3cor_er   = np.zeros(n_p)
-histo_x    = np.zeros(nxhist)
+histo_x    = np.zeros(nxhist, dtype = np.float64)
 #starting configuration-----------------------------------------|
 x = fn.periodic_starting_conf( n, f, mode)
 #---------montecarlo generations--------------------------------|
@@ -124,8 +124,11 @@ for i in tqdm(range(nmc)):
         x2_sum += np.sum(x**2)
         x4_sum += np.sum(x**4)
         x8_sum += np.sum(x**8)
-    for k in range(n):
-        fn.histogramarray(x[k], xhist_min, stxhist, nxhist, histo_x)
+    
+        
+    partial_histogram_x, _ = np.histogram(x, nxhist, (xhist_min,-xhist_min))
+    histo_x = np.add(histo_x, partial_histogram_x)
+    
     #output configuration
     if i % kp == 0:
         config1.write("{}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(i, S, T, V))

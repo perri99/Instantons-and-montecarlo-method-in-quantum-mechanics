@@ -109,14 +109,16 @@ for i in tqdm(range(nmc)):
     x = fn.new_config(x, n, N_inst, z, f, a)
     #   distribution of instantons                                             
     #--------------------------------------------------------------------------
-    fn.instanton_distribution(z, N_inst, tmax, stzhist, nzhist, iz)
+    zero_crossing_histogram = \
+        fn.instanton_distribution(z, N_inst, tmax, nzhist)
+    iz = np.add(iz, zero_crossing_histogram)
     #Computations
     tvtot = 0.0
     ttot = fn.kinetic(x, n, a)
     vtot = fn.potential(x, n, a, f)
     S_tot = ttot + vtot
     for j in range(1,n):
-        tv = 2.0*x[j]**2*(x[j]**2-f**2)
+        tv = 2.0*x[j]**2 * (x[j]**2 - f**2)
         tvtot += a*tv
         
     #output configurations
@@ -126,7 +128,7 @@ for i in tqdm(range(nmc)):
            config2.write("{:.4f}\t{:.4f}\n".format(k*a, x[k]))
         config2.write("------------------\n\n")
     
-    #Histogram creation
+    
     S_sum  += S_tot
     S2_sum += S_tot**2
     V_sum  += vtot

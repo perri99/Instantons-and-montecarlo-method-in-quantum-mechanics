@@ -238,7 +238,9 @@ for i in tqdm(range(nmc)):
            scool_sum[icool] += Sc
            scool2_sum[icool]+= Sc**2
         #--------------cooled configuration: instanton distribution  -------------|                          
-        fn.instanton_distribution(z, nin, tmax, stzhist, nzhist, iz)
+           zero_crossing_histogram = \
+                 fn.instanton_distribution(z, nin, tmax, nzhist)
+           iz = np.add(iz, zero_crossing_histogram)
         #--------------cooled correlator------------------------------------------|
         for ic in range(nc):
             ipa[ic] = int((n-n_p)*random.random())

@@ -948,7 +948,7 @@ def correlations_functions_ipa(x,n,n_p):
 def cool_correlations_functions(x, ip0, n, n_p):
     '''
     correlationfunctions for cooled configuration. The starting points\
-        for the evaluation are passe as parameters
+        for the evaluation are passed as parameters
 
     Parameters
     ----------
@@ -1070,39 +1070,41 @@ def histogramarray(x, xmin, st, m, hist):
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
-def instanton_distribution(z, nin, tmax, stzhist, nzhist, iz):
+def instanton_distribution(z, nin, tmax, nzhist):
     '''
-    construction of instanton distribution in the array iz 
+    construction of instanton distribution 
 
     Parameters
     ----------
     z : array(float)
         instantons time location
     nin : int
-        intanton + anti-instanton number.
-    tmax : float
-        higher bound on euclidean time.
-    stzhist : float
-        bin width.
+        instanton + anti-instanton number.
     nzhist : int
-        bin width.
-    iz : array(float)
-        histogram array for storage.
+        bin number.
 
     Returns
     -------
-    None.
+    zero_crossing_histogram : array(float)
+        zero crossing distance distribution
 
     '''
-    for ii in range(1, nin, 2):
-        #if ii == 0:
-         #   zm = z[nin] -tmax
-        #else:
-        zm = z[ii-1]
+    zero_crossing_array = np.empty(0)
+    for ii in range(0, nin, 2):
+        if ii == 0:
+            zm = z[-1] -tmax
+        else:
+            zm = z[ii-1]
         z0  = z[ii]
         zp  = z[ii+1]
+        
         zia = min(np.abs(zp-z0), np.abs(z0-zm))    #zero crossing distance
-        histogramarray( zia, 0.0, stzhist, nzhist, iz)
+        #zia = z[ii] - z[ii-1]
+        zero_crossing_array = np.append(zero_crossing_array, zia)
+    
+    zero_crossing_histogram, _ = np.histogram(zero_crossing_array,\
+                                               nzhist, (0., 4.) )
+    return zero_crossing_histogram
 #---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 @nb.jit(nopython = True)
@@ -1229,7 +1231,7 @@ def instantons(a, n, x):
     ni = 0
     na = 0
     nin= 0
-    z = np.array([0.0])
+    z = np.empty(0)
     p = int(np.sign(x[0]))
     for i in range(1,n):
         ixp = int(np.sign(x[i]))
@@ -1338,7 +1340,7 @@ def streamline_equation(n_lattice_half, r_initial_sep,\
             if n_i == 1:
                 interactive_action = s - 2 * s0
 
-                tau_i_a = np.abs(z[2] - z[1])
+                tau_i_a = np.abs(z[1] - z[0])
                 if tau_i_a < tau_store - 0.08:
                     stream.write('{:.4f}\t{:.4f}\n'.format(tau_i_a, interactive_action/s0))
         
@@ -1501,11 +1503,11 @@ def zero_crossing_sum_ansatz(x, n=800, f=1.4, a = 0.05):
         x = new_config(x,n,2,z,f,a)
         n_inst, n_a_inst, k = instantons(a, n, x)
         nin = n_inst + n_a_inst
-        for ii in range(1, nin, 2):
+        for ii in range(0, nin, 2):
             zm = k[ii-1]
             z0  = k[ii]
             zp  = k[ii+1]
-            z_ia = min(zp-z0, z0-zm)
+            z_ia = min(np.abs(zp-z0), np.abs(z0-zm))
             tau_ia_zcr = np.append(tau_ia_zcr, z_ia)
             action_int_zcr = np.append(action_int_zcr, action(x,n,a,f))
     action_int_zcr /= s0

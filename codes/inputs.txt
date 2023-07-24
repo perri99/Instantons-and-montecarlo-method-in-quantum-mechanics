@@ -34,7 +34,7 @@ Lattice spacing (a ∼ 0.05)
 a      = 0.05
 
 Choose 0 (cold start), choose 1 (hot start)
-mode  = 0
+mode  = 1
 
 Number of equilibration sweeps before first measurement (neq ∼ 100)
 neq    = 100
@@ -58,7 +58,7 @@ Number of sweeps between cooling
 kp2    = 50
 
 Number of cooling sweeps (ncool<5000)
-ncool  = 200
+ncool  = 10
 
 Number of steps in adiabatic switching (nswitch ∼ 20)
 n_alpha = 20

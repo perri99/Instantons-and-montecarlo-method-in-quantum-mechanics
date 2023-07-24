@@ -109,16 +109,22 @@ for loop in range(6):
             
     #----------------end of loops over coupling constant alpha---------------------|
     #-----------------------integrating over alpha---------------------------------|
-    nongaussian_instanton_action, nongaussian_inst_action_error = fn.summing(n_alpha, dalpha, Vainst_av, Vainst_err)
-    nongaussian_vacuum_action, nongaussian_vac_action_error = fn.summing(n_alpha, dalpha, Vavac_av, Vavac_err)
+    nongaussian_instanton_action, \
+        nongaussian_inst_action_error = fn.summing(n_alpha, dalpha,\
+                                                   Vainst_av, Vainst_err)
+    nongaussian_vacuum_action,\
+        nongaussian_vac_action_error = fn.summing(n_alpha, dalpha,\
+                                                  Vavac_av, Vavac_err)
 
     effective_action    = nongaussian_instanton_action - nongaussian_vacuum_action
-    effective_action_error = np.sqrt(nongaussian_inst_action_error**2+nongaussian_vac_action_error**2)
+    effective_action_error = np.sqrt(nongaussian_inst_action_error**2\
+                                     + nongaussian_vac_action_error**2)
     
     nongaussian_density = dens*np.exp(-effective_action)
     nongaussian_density_error = nongaussian_density*effective_action_error
     
-    density.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f[loop], nongaussian_density, nongaussian_density_error))
+    density.write('{:.4f}\t{:.4f}\t{:.4f}\n'.format(f[loop], nongaussian_density,\
+                                                    nongaussian_density_error))
 
 density.close()
     
