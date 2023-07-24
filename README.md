@@ -39,7 +39,8 @@ This program only evaluate the value of the free energy for a fixed  tmperature 
  - `rilmgauss.py`: this program generates the same random instanton ensemble as `rilm.py` but it also includes Gaussian fluctuations around the classical path. This is done by performing a few heating sweeps in the Gaussian effective potential;
  - `iilm.py`: this program computes correlation functions of the anharmonic oscillator using an interacting ensemble of instantons.  Very close instanton-anti-instanton pairs are excluded by adding  a nearest neighbor interaction with a repulsive core (hardcore interaction);
  - `streamline.py`: this program solve the streamline equation for an instanton-anti instanton pair using descent method;
- - `plots.py`: graphical analysis of data coming from the previous programs
+ -  `zero_crossing.py`: this program compute zero crossing distibution for cooled configuration and compare it with random gas model and interactive model;
+ - `plots.py`: graphical analysis of datas coming from the previous programs
 
 The output datas of a given program are stored in .dat files in the directory 'Data/program_name'. The directory of a programme is created the first time the programme is runned. Also the plots are saved in such directories in .pdf and .png format.
 
@@ -61,6 +62,7 @@ The output datas of a given program are stored in .dat files in the directory 'D
      - `rilmgauss.py`
      -  `iilm.py`
      -   `streamline.py`
+     -   `zero_crossing.py`
  5. For a complete graphical analysis run  `plots.py`
 
 # 4.Reference
