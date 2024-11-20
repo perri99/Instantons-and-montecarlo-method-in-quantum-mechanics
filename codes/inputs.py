@@ -8,7 +8,7 @@ def loading_inputs():
     loading inputs from external file
 
     '''
-    file = open('inputs.txt', 'r')
+    file = open('codes/inputs.txt', 'r')
     params = {}
     for line in file:
         line = line.strip() 
